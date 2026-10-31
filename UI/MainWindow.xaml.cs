@@ -12,18 +12,20 @@ partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        SourceInitialized += (_, _) =>
-        {
-            var hwnd = new WindowInteropHelper(this).Handle;
-            int dark = 1;
-            DwmSetWindowAttribute(hwnd, 20, ref dark, sizeof(int));
-            int caption = 0x1B1512;
-            DwmSetWindowAttribute(hwnd, 35, ref caption, sizeof(int));
-        };
+        SourceInitialized += (_, _) => DarkTitleBar(this);
         DataContextChanged += (_, _) =>
         {
             if (DataContext is MainViewModel vm)
                 ((INotifyCollectionChanged)vm.LogLines).CollectionChanged += (_, _) => LogScroll.ScrollToEnd();
         };
+    }
+
+    public static void DarkTitleBar(Window window)
+    {
+        var hwnd = new WindowInteropHelper(window).Handle;
+        int dark = 1;
+        DwmSetWindowAttribute(hwnd, 20, ref dark, sizeof(int));
+        int caption = 0x1B1512;
+        DwmSetWindowAttribute(hwnd, 35, ref caption, sizeof(int));
     }
 }

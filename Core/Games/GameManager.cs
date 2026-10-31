@@ -17,12 +17,12 @@ sealed class GameManager : IDisposable
     readonly Config _cfg;
     readonly GameDetector _detector;
 
-    public GameManager(BridgeService bridge, string dataDir)
+    public GameManager(BridgeService bridge, string dataDir, List<LibraryGame>? demoLibrary = null)
     {
         _bridge = bridge;
         _cfg = bridge.Config;
         Pcgw = new PcgwClient(Path.Combine(dataDir, "pcgw-cache.json"));
-        _detector = new GameDetector(_cfg);
+        _detector = new GameDetector(_cfg, watch: demoLibrary == null);
         _detector.GameStarted += OnStarted;
         _detector.GameStopped += OnStopped;
         _detector.LibraryChanged += () =>
@@ -30,8 +30,11 @@ sealed class GameManager : IDisposable
             MigrateProfiles();
             Changed?.Invoke();
         };
-        Task.Run(_detector.RescanLibrary);
+        if (demoLibrary != null) _detector.UseLibrary(demoLibrary);
+        else Task.Run(_detector.RescanLibrary);
     }
+
+    public void StartDemo(GameInfo game) => OnStarted(game);
 
     public event Action? Changed;
     public event Action<GameSession>? GameLaunched;
@@ -252,7 +255,7 @@ sealed class GameManager : IDisposable
         _ => false,
     });
 
-    public void UpdateAudioHaptics() => _bridge.SetAudioHapticsTarget(AudioHapticsOn ? Current!.Game.ProcessId : null);
+    public void UpdateAudioHaptics() => _bridge.SetAudioHapticsTarget(AudioHapticsOn && Current!.Game.ProcessId > 0 ? Current.Game.ProcessId : null);
 
     public void Dispose() => _detector.Dispose();
 }

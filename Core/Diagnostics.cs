@@ -118,6 +118,22 @@ static class Diagnostics
         return frames > 0 ? 0 : 1;
     }
 
+    public static int CheckUpdate(bool force)
+    {
+        Console.WriteLine($"Current version: {Updater.Current}");
+        var update = Updater.CheckAsync(includePrereleases: true, force ? new SemVersion(0, 0, 0, []) : null).GetAwaiter().GetResult();
+        if (update == null)
+        {
+            Console.WriteLine("No newer release.");
+            return 0;
+        }
+        Console.WriteLine($"Release {update.Version} ({update.Tag}), package {update.AssetName ?? "missing"}");
+        if (update.AssetUrl == null) return 1;
+        string exe = Updater.DownloadAsync(update, new Progress<string>(s => { if (!s.StartsWith("Downloading")) Console.WriteLine(s); })).GetAwaiter().GetResult();
+        Console.WriteLine($"Verified and unpacked: {exe}");
+        return 0;
+    }
+
     public static int Games(string[] extra)
     {
         var games = new List<GameInfo>();
@@ -458,6 +474,11 @@ static class Diagnostics
         ];
         var badNames = names.Where(n => GameNames.Clean(n.raw) != n.clean).Select(n => $"{n.raw} -> {GameNames.Clean(n.raw)}").ToList();
         Check(badNames.Count == 0, "Game names cleaned from folders and release names" + (badNames.Count > 0 ? ": " + string.Join("; ", badNames) : ""));
+
+        string[] order = ["0.5.9", "0.6.0-alpha.1", "0.6.0-alpha.2", "0.6.0-alpha.10", "0.6.0-alpha.beta", "0.6.0-beta.1", "0.6.0-rc.1", "0.6.0", "0.6.1-alpha.1", "1.0.0"];
+        bool ordered = order.Zip(order.Skip(1)).All(p => SemVersion.Parse(p.First)! < SemVersion.Parse(p.Second)!);
+        Check(ordered && SemVersion.Parse("v0.6.0-alpha.1")!.ToString() == "0.6.0-alpha.1", "Update versions compare by SemVer rules");
+        Check(Updater.Current.ToString() == "0.6.0-alpha.1", $"Build reports its version ({Updater.Current})");
 
         Log.Info(failures == 0 ? "Self-test passed" : $"Self-test: {failures} failure(s)");
         return failures == 0 ? 0 : 1;

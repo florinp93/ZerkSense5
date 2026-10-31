@@ -55,6 +55,10 @@ sealed class Config
     public bool ShowInstalledGames { get; set; } = true;
 
     public bool StartMinimized { get; set; }
+    public bool SkipSetupPrompt { get; set; }
+    public bool AutoCheckUpdates { get; set; } = true;
+    public bool? IncludePrereleases { get; set; }
+    public string? SkippedVersion { get; set; }
     public bool LowBatteryAlert { get; set; } = true;
     public bool UseHidHide { get; set; } = true;
     public string UsbipPath { get; set; } = "";

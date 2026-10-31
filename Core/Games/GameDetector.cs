@@ -50,10 +50,16 @@ sealed class GameDetector : IDisposable
     Process? _currentProcess;
     int _busy;
 
-    public GameDetector(Config cfg)
+    public GameDetector(Config cfg, bool watch = true)
     {
         _cfg = cfg;
-        _timer = new Timer(_ => Tick(), null, 1000, 2000);
+        _timer = new Timer(_ => Tick(), null, watch ? 1000 : Timeout.Infinite, 2000);
+    }
+
+    public void UseLibrary(List<LibraryGame> games)
+    {
+        lock (_lock) _library = games;
+        LibraryChanged?.Invoke();
     }
 
     public event Action<GameInfo>? GameStarted;

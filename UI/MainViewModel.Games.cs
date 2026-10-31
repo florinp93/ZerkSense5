@@ -158,13 +158,14 @@ partial class MainViewModel
         var items = new Dictionary<string, GameListItem>();
         lock (_cfg.Games)
             foreach (var (key, p) in _cfg.Games)
-                items[key] = new GameListItem(key, p.Name, p.Source, null, p.ExePath, p.LastPlayed, key == running);
+                items[key] = new GameListItem(key, p.Name, p.Source,
+                    key.StartsWith("steam:") && int.TryParse(key[6..], out int id) ? id : null, p.ExePath, p.LastPlayed, key == running);
         if (_cfg.ShowInstalledGames)
             foreach (var g in _games.Library)
             {
                 if (items.TryGetValue(g.Key, out var played))
                 {
-                    items[g.Key] = new GameListItem(g.Key, played.Name, played.Source, g.SteamAppId, played.Exe ?? g.Exe, played.LastPlayed, played.Running);
+                    items[g.Key] = new GameListItem(g.Key, played.Name, played.Source, g.SteamAppId ?? played.SteamAppId, played.Exe ?? g.Exe, played.LastPlayed, played.Running);
                     continue;
                 }
                 bool ignored;
@@ -196,7 +197,7 @@ partial class MainViewModel
     {
         var lib = _games.Library.FirstOrDefault(g => g.Key == item.Key);
         string? exe = item.Exe ?? (lib == null ? null : await Task.Run(() => GameLibrary.GuessExe(lib)));
-        item.Icon = await GameArt.IconAsync(exe);
+        item.Icon = await GameArt.IconAsync(exe) ?? (item.SteamAppId is int appId ? await GameArt.CoverAsync(appId, null) : null);
         if (item.Key == _selected?.Key) Notify(nameof(SelectedIcon));
         if (item.Key == _games.Current?.Game.Key) Notify(nameof(GameIcon));
     }
@@ -297,7 +298,7 @@ partial class MainViewModel
     public bool NoGame => S == null;
     public string GameTitle => S?.Game.Name ?? "";
     public ImageSource? GameIcon => S == null ? null : GameList.FirstOrDefault(i => i.Key == S.Game.Key)?.Icon;
-    public string GameSource => S == null ? "" : $"{S.Game.Source} · {Path.GetFileName(S.Game.ExePath)}";
+    public string GameSource => S == null ? "" : S.Game.ExePath.Length == 0 ? S.Game.Source : $"{S.Game.Source} · {Path.GetFileName(S.Game.ExePath)}";
     public string GameVerdict => S == null ? "" : S.LookingUp ? "Looking up PCGamingWiki…" : S.Verdict.Summary;
     public string GameModeText => S == null ? "" :
         (S.Profile.Mode == ControllerMode.Auto ? "Recommended: " : "Profile: ") +

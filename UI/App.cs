@@ -14,10 +14,13 @@ sealed class App : Application
     Hotkey? _hotkey;
     bool _exiting, _hintShown;
 
-    public App(BridgeService service, bool startHidden)
+    readonly bool _demo;
+
+    public App(BridgeService service, bool startHidden, bool demo = false)
     {
         _service = service;
         _startHidden = startHidden;
+        _demo = demo;
         ShutdownMode = ShutdownMode.OnExplicitShutdown;
         Resources.MergedDictionaries.Add(new ResourceDictionary
         {
@@ -29,7 +32,9 @@ sealed class App : Application
     {
         base.OnStartup(e);
         var dataDir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ZerkSense5");
-        _games = new GameManager(_service, dataDir);
+        _games = _demo
+            ? new GameManager(_service, Path.Combine(Path.GetTempPath(), "ZerkSense5", "demo"), Demo.Library)
+            : new GameManager(_service, dataDir);
         _overlay = new OverlayWindow();
         _games.GameLaunched += s => Dispatcher.BeginInvoke(() =>
         {
@@ -38,6 +43,8 @@ sealed class App : Application
         _hotkey = new Hotkey(Hotkey.Control | Hotkey.Alt, 'Z', () => ShowOverlay(_games.Current));
 
         var vm = new MainViewModel(_service, _games, () => ShowOverlay(_games.Current));
+        vm.SetupRequested += ShowSetup;
+        vm.UpdateFound += u => _tray?.ShowInfo("Update available", $"Zerk Sense 5 {u.Version} is ready to install. Open the app to update.");
         _window = new MainWindow { DataContext = vm };
         _window.Closing += (_, args) =>
         {
@@ -58,13 +65,30 @@ sealed class App : Application
         SingleInstance.Listen(() => Dispatcher.BeginInvoke(ShowWindow));
 
         if (!_startHidden) ShowWindow();
+        if (_demo)
+        {
+            _service.EnterDemo(Demo.Controller);
+            _games.StartDemo(Demo.Running);
+        }
+        else if (!_service.Config.SkipSetupPrompt && SetupWindow.AnyMissing(_service.Config))
+        {
+            if (_startHidden) _tray.ShowInfo("Zerk Sense 5 needs a driver", "Open Zerk Sense 5 to install usbip-win2 and HidHide.");
+            else Dispatcher.BeginInvoke(ShowSetup, System.Windows.Threading.DispatcherPriority.ApplicationIdle);
+        }
     }
 
     async void ShowOverlay(GameSession? session)
     {
         var monitor = session != null ? GameDetector.MonitorOf(session.Game.ProcessId) : null;
-        var icon = session == null ? null : await GameArt.IconAsync(session.Game.ExePath);
+        var icon = session == null ? null : await GameArt.IconAsync(session.Game.ExePath)
+                   ?? (session.Game.SteamAppId is int appId ? await GameArt.CoverAsync(appId, null) : null);
         _overlay?.ShowFor(OverlayModel.Build(session, _service.Controller, _service.Config, icon), monitor, _service.Config.OverlaySeconds);
+    }
+
+    void ShowSetup()
+    {
+        ShowWindow();
+        new SetupWindow(_service.Config) { Owner = _window }.ShowDialog();
     }
 
     void ShowWindow()

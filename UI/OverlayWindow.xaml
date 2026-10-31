@@ -24,7 +24,7 @@
 
             <Grid Margin="0,12,0,0">
                 <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                <Image Source="{Binding Icon}" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
+                <Image Source="{Binding Icon}" Width="28" Height="28" Stretch="UniformToFill" Margin="0,0,10,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
                        Visibility="{Binding HasIcon, Converter={StaticResource OverlayVisible}}" />
                 <TextBlock Grid.Column="1" Text="{Binding Title}" FontFamily="{StaticResource DisplayFont}" FontSize="20" FontWeight="SemiBold"
                            TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />

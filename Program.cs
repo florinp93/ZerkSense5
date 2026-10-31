@@ -10,9 +10,19 @@ static class Program
     [STAThread]
     static int Main(string[] args)
     {
+        int apply = Array.IndexOf(args, "--apply-update");
+        if (apply >= 0 && args.Length > apply + 2 && int.TryParse(args[apply + 2], out int oldPid))
+            return Updater.Apply(args[apply + 1], oldPid);
+
+        if (args.Contains("--demo"))
+        {
+            using var demoService = new BridgeService(Demo.CreateConfig());
+            return new App(demoService, startHidden: false, demo: true).Run();
+        }
+
         var cfg = Config.Load(Path.Combine(AppContext.BaseDirectory, "config.json"));
 
-        if (args.Contains("--probe") || args.Contains("--selftest") || args.Contains("--games") || args.Contains("--capture"))
+        if (args.Contains("--probe") || args.Contains("--selftest") || args.Contains("--games") || args.Contains("--capture") || args.Contains("--check-update"))
         {
             AttachConsole(-1);
             if (args.Contains("--capture"))
@@ -20,6 +30,7 @@ static class Program
                 var pidArg = args.SkipWhile(a => a != "--capture").Skip(1).FirstOrDefault();
                 return Diagnostics.Capture(cfg, int.TryParse(pidArg, out int pid) ? pid : null);
             }
+            if (args.Contains("--check-update")) return Diagnostics.CheckUpdate(args.Contains("--force"));
             if (args.Contains("--games")) return Diagnostics.Games(args.SkipWhile(a => a != "--games").Skip(1).ToArray());
             return args.Contains("--probe") ? Diagnostics.Probe() : Diagnostics.SelfTest(new Config());
         }

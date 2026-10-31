@@ -215,6 +215,24 @@
                 <StackPanel Margin="36,30,36,24" MaxWidth="900">
                     <TextBlock Text="Overview" Style="{StaticResource PageTitle}" />
                     <TextBlock Text="Your DualSense over Bluetooth, presented to Windows as a wired controller." Style="{StaticResource PageSubtitle}" />
+                    <Border Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
+                            Visibility="{Binding UpdateAvailable, Converter={StaticResource Visible}}">
+                        <Grid>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
+                            <StackPanel Grid.Column="1">
+                                <TextBlock Text="{Binding UpdateTitle}" Style="{StaticResource CardTitle}" />
+                                <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                                    <Button Content="Release notes" Style="{StaticResource LinkButton}" Command="{Binding OpenReleaseNotes}" Margin="0,0,16,0" />
+                                    <Button Content="Skip this version" Style="{StaticResource LinkButton}" Command="{Binding SkipUpdate}" Foreground="{StaticResource Subtext}" />
+                                </StackPanel>
+                            </StackPanel>
+                            <Button Grid.Column="2" Content="{Binding InstallUpdateText}" Style="{StaticResource AccentButton}" Command="{Binding InstallUpdate}"
+                                    IsEnabled="{Binding CanInstallUpdate}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                        </Grid>
+                    </Border>
+
 
                     <Border Style="{StaticResource CardBorder}" Background="{StaticResource HeroGradient}" Padding="28,24">
                         <Grid>
@@ -253,8 +271,8 @@
                                 <TextBlock Text="usbip-win2 is not installed" Style="{StaticResource CardTitle}" />
                                 <TextBlock Style="{StaticResource Hint}" Text="It provides the virtual USB port that lets games see a wired DualSense. Battery and lighting work without it; haptics, speaker and mic need it." />
                             </StackPanel>
-                            <Button Grid.Column="2" Content="Get usbip-win2" Style="{StaticResource AccentButton}" VerticalAlignment="Center" Margin="16,0,0,0"
-                                    Command="{Binding OpenUrl}" CommandParameter="https://github.com/vadimgrn/usbip-win2/releases" />
+                            <Button Grid.Column="2" Content="Install usbip-win2" Style="{StaticResource AccentButton}" VerticalAlignment="Center" Margin="16,0,0,0"
+                                    Command="{Binding OpenSetup}" />
                         </Grid>
                     </Border>
                     <Border Style="{StaticResource CardBorder}" Visibility="{Binding ShowHidHideMissing, Converter={StaticResource Visible}}">
@@ -269,8 +287,8 @@
                                 <TextBlock Text="Recommended: HidHide" Style="{StaticResource CardTitle}" />
                                 <TextBlock Style="{StaticResource Hint}" Text="Hides the Bluetooth controller so Steam and games don't see two DualSenses." />
                             </StackPanel>
-                            <Button Grid.Column="2" Content="Get HidHide" Style="{StaticResource GhostButton}" VerticalAlignment="Center" Margin="16,0,0,0"
-                                    Command="{Binding OpenUrl}" CommandParameter="https://github.com/nefarius/HidHide/releases" />
+                            <Button Grid.Column="2" Content="Install HidHide" Style="{StaticResource GhostButton}" VerticalAlignment="Center" Margin="16,0,0,0"
+                                    Command="{Binding OpenSetup}" />
                         </Grid>
                     </Border>
 
@@ -322,7 +340,7 @@
                         <Grid>
                             <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                             <Border Width="56" Height="56" CornerRadius="12" Background="#22FFFFFF" VerticalAlignment="Top" Margin="0,4,18,0">
-                                <Image Source="{Binding GameIcon}" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality" />
+                                <Image Source="{Binding GameIcon}" Width="40" Height="40" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
                             </Border>
                             <StackPanel Grid.Column="1">
                                 <TextBlock Text="NOW PLAYING" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentLight}" />
@@ -384,7 +402,7 @@
                                                     <Grid>
                                                         <TextBlock Text="{Binding Initial}" FontWeight="SemiBold" Foreground="{StaticResource Subtext}" HorizontalAlignment="Center" VerticalAlignment="Center"
                                                                    Visibility="{Binding HasIcon, Converter={StaticResource Hidden}}" />
-                                                        <Image Source="{Binding Icon}" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality" />
+                                                        <Image Source="{Binding Icon}" Width="26" Height="26" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
                                                     </Grid>
                                                 </Border>
                                                 <StackPanel Grid.Column="1" VerticalAlignment="Center">
@@ -1044,6 +1062,46 @@
                                 <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding LowBatteryAlert}" />
                             </Grid>
                         </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardBorder}">
+                        <StackPanel>
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="Updates" Style="{StaticResource CardTitle}" />
+                                    <TextBlock Text="{Binding CurrentVersionText}" Style="{StaticResource Hint}" />
+                                </StackPanel>
+                                <Button Content="Check now" Style="{StaticResource GhostButton}" Command="{Binding CheckUpdates}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                            </Grid>
+                            <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" Foreground="{StaticResource AccentLight}" Margin="0,6,0,0" />
+                            <Border Style="{StaticResource Divider}" />
+                            <Grid Style="{StaticResource Row}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Check for updates automatically" Style="{StaticResource Label}" />
+                                    <TextBlock Text="Looks at the GitHub releases on start and twice a day. Nothing is installed without asking." Style="{StaticResource Hint}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding AutoCheckUpdates}" />
+                            </Grid>
+                            <Grid Style="{StaticResource Row}">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="Include alpha and beta versions" Style="{StaticResource Label}" />
+                                    <TextBlock Text="Pre-releases get new features first and may have rough edges." Style="{StaticResource Hint}" />
+                                </StackPanel>
+                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding IncludePrereleases}" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+
+                    <Border Style="{StaticResource CardBorder}">
+                        <Grid>
+                            <StackPanel>
+                                <TextBlock Text="Drivers" Style="{StaticResource CardTitle}" />
+                                <TextBlock Text="{Binding DriversText}" Style="{StaticResource Hint}" />
+                            </StackPanel>
+                            <Button Content="Manage" Style="{StaticResource GhostButton}" Command="{Binding OpenSetup}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                        </Grid>
                     </Border>
 
                     <Border Style="{StaticResource CardBorder}">

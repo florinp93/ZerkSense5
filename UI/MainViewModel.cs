@@ -38,6 +38,7 @@ sealed partial class MainViewModel : INotifyPropertyChanged
             while (LogLines.Count > 500) LogLines.RemoveAt(0);
         });
         OpenUrl = new Relay(p => Process.Start(new ProcessStartInfo((string)p!) { UseShellExecute = true }));
+        OpenSetup = new Relay(_ => SetupRequested?.Invoke());
         SetColor = new Relay(p =>
         {
             var c = (Color)ColorConverter.ConvertFromString((string)p!);
@@ -52,6 +53,7 @@ sealed partial class MainViewModel : INotifyPropertyChanged
         InitGames(showOverlay);
         InitEffects();
         InitLibrary();
+        InitUpdates();
         Refresh();
     }
 
@@ -72,7 +74,7 @@ sealed partial class MainViewModel : INotifyPropertyChanged
                      nameof(StatusBrush), nameof(BatteryPercent), nameof(BatteryText), nameof(PowerText),
                      nameof(IsCharging), nameof(VirtualText), nameof(VirtualBrush), nameof(HidHideText),
                      nameof(HidHideBrush), nameof(HeadsetText), nameof(RateText), nameof(StreamsText),
-                     nameof(ShowUsbipMissing), nameof(ShowHidHideMissing), nameof(MicMutedText),
+                     nameof(ShowUsbipMissing), nameof(ShowHidHideMissing), nameof(MicMutedText), nameof(DriversText),
                  })
             Notify(p);
     }
@@ -281,9 +283,11 @@ sealed partial class MainViewModel : INotifyPropertyChanged
         }
     }
 
-    public string VersionText => $"Zerk Sense 5 · v{typeof(MainViewModel).Assembly.GetName().Version?.ToString(3)}";
+    public string VersionText => $"Zerk Sense 5 · v{Updater.Current}";
 
     public ICommand OpenUrl { get; }
+    public ICommand OpenSetup { get; }
+    public event Action? SetupRequested;
     public ICommand SetColor { get; }
     public ICommand BrowseUsbip { get; }
 }
