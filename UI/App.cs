@@ -60,10 +60,11 @@ sealed class App : Application
         if (!_startHidden) ShowWindow();
     }
 
-    void ShowOverlay(GameSession? session)
+    async void ShowOverlay(GameSession? session)
     {
         var monitor = session != null ? GameDetector.MonitorOf(session.Game.ProcessId) : null;
-        _overlay?.ShowFor(OverlayModel.Build(session, _service.Controller, _service.Config), monitor, _service.Config.OverlaySeconds);
+        var icon = session == null ? null : await GameArt.IconAsync(session.Game.ExePath);
+        _overlay?.ShowFor(OverlayModel.Build(session, _service.Controller, _service.Config, icon), monitor, _service.Config.OverlaySeconds);
     }
 
     void ShowWindow()

@@ -106,6 +106,8 @@ sealed class TriggerLabViewModel : INotifyPropertyChanged
     readonly Config _cfg;
     readonly TriggerManager _triggers;
     readonly Func<GameProfile?> _selectedProfile;
+    readonly Func<GameProfile?> _editProfile;
+    readonly Func<string?> _selectedName;
     readonly Action _profileChanged;
     readonly Action _save;
     int _target;
@@ -122,8 +124,11 @@ sealed class TriggerLabViewModel : INotifyPropertyChanged
     public ICommand UseCapturedLeft { get; }
     public ICommand UseCapturedRight { get; }
 
-    public TriggerLabViewModel(Config cfg, TriggerManager triggers, Func<GameProfile?> selectedProfile, Action profileChanged, Action save)
+    public TriggerLabViewModel(Config cfg, TriggerManager triggers, Func<GameProfile?> selectedProfile, Func<GameProfile?> editProfile,
+        Func<string?> selectedName, Action profileChanged, Action save)
     {
+        _editProfile = editProfile;
+        _selectedName = selectedName;
         _cfg = cfg;
         _triggers = triggers;
         _selectedProfile = selectedProfile;
@@ -157,13 +162,13 @@ sealed class TriggerLabViewModel : INotifyPropertyChanged
 
     TriggerEffect? Get(int side)
     {
-        if (Profile is { } p) return p.CustomTriggers == true ? (side == 0 ? p.TriggerL : p.TriggerR) : null;
+        if (_target == 1) return Profile is { CustomTriggers: true } p ? (side == 0 ? p.TriggerL : p.TriggerR) : null;
         return side == 0 ? _cfg.TriggerL : _cfg.TriggerR;
     }
 
     void Set(int side, TriggerEffect? e)
     {
-        if (Profile is { } p)
+        if (_target == 1 && _editProfile() is { } p)
         {
             if (side == 0) p.TriggerL = e;
             else p.TriggerR = e;
@@ -195,16 +200,16 @@ sealed class TriggerLabViewModel : INotifyPropertyChanged
         }
     }
 
-    public bool HasGameTarget => _selectedProfile() != null;
-    public string GameTargetName => _selectedProfile()?.Name ?? "No game selected";
-    public bool EditingGame => _target == 1 && Profile != null;
+    public bool HasGameTarget => _selectedName() != null;
+    public string GameTargetName => _selectedName() ?? "No game selected";
+    public bool EditingGame => _target == 1 && HasGameTarget;
 
     public int ProfileTriggerMode
     {
         get => _selectedProfile()?.CustomTriggers switch { true => 2, false => 1, _ => 0 };
         set
         {
-            if (_selectedProfile() is not { } p) return;
+            if (_editProfile() is not { } p) return;
             p.CustomTriggers = value switch { 2 => true, 1 => false, _ => null };
             _profileChanged();
             _triggers.Apply();

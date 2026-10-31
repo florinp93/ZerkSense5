@@ -23,6 +23,8 @@ sealed class GameProfile
     public TriggerEffect? TriggerL { get; set; }
     public TriggerEffect? TriggerR { get; set; }
     public DateTime LastPlayed { get; set; }
+    public string? ExePath { get; set; }
+    public string? PcgwPage { get; set; }
 }
 
 sealed record Verdict(ControllerMode Recommended, string Summary, bool FromPcgw)

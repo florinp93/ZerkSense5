@@ -9,7 +9,7 @@ partial class MainViewModel
 
     void InitEffects()
     {
-        TriggerLab = new TriggerLabViewModel(_cfg, _service.Triggers, () => SelectedProfile, ProfileChanged, () =>
+        TriggerLab = new TriggerLabViewModel(_cfg, _service.Triggers, () => SelectedProfile, () => EditProfile, () => _selected?.Name, ProfileChanged, () =>
         {
             _saveTimer.Stop();
             _saveTimer.Start();
@@ -100,8 +100,8 @@ partial class MainViewModel
         get => SelectedProfile?.AudioHaptics switch { true => 1, false => 2, _ => 0 };
         set
         {
-            if (SelectedProfile == null) return;
-            SelectedProfile.AudioHaptics = value switch { 1 => true, 2 => false, _ => null };
+            if (EditProfile is not { } profile) return;
+            profile.AudioHaptics = value switch { 1 => true, 2 => false, _ => null };
             ProfileChanged();
             _games.UpdateAudioHaptics();
         }

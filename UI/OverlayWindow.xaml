@@ -22,8 +22,13 @@
                 </StackPanel>
             </Grid>
 
-            <TextBlock Text="{Binding Title}" FontFamily="{StaticResource DisplayFont}" FontSize="20" FontWeight="SemiBold"
-                       TextTrimming="CharacterEllipsis" Margin="0,12,0,0" />
+            <Grid Margin="0,12,0,0">
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                <Image Source="{Binding Icon}" Width="28" Height="28" Margin="0,0,10,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"
+                       Visibility="{Binding HasIcon, Converter={StaticResource OverlayVisible}}" />
+                <TextBlock Grid.Column="1" Text="{Binding Title}" FontFamily="{StaticResource DisplayFont}" FontSize="20" FontWeight="SemiBold"
+                           TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+            </Grid>
             <TextBlock Text="{Binding Subtitle}" FontSize="12" Foreground="{StaticResource Subtext}" TextWrapping="Wrap" Margin="0,3,0,0" />
 
             <Border HorizontalAlignment="Left" CornerRadius="11" Padding="10,4" Margin="0,12,0,0" Background="{Binding ModeBrush}"

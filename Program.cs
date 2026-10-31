@@ -21,7 +21,7 @@ static class Program
                 return Diagnostics.Capture(cfg, int.TryParse(pidArg, out int pid) ? pid : null);
             }
             if (args.Contains("--games")) return Diagnostics.Games(args.SkipWhile(a => a != "--games").Skip(1).ToArray());
-            return args.Contains("--probe") ? Diagnostics.Probe() : Diagnostics.SelfTest(cfg);
+            return args.Contains("--probe") ? Diagnostics.Probe() : Diagnostics.SelfTest(new Config());
         }
 
         using var single = new Mutex(true, @"Local\ZerkSense5", out bool first);

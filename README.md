@@ -16,8 +16,11 @@ For games without DualSense support it can plug in a virtual **Xbox 360 controll
 
 - **Wired features over Bluetooth:** HD haptics, speaker, headset jack, microphone, adaptive triggers and lightbar.
 - **Battery:** level and charging state in the app and in the tray icon, plus a low battery alert.
-- **Game detection:** Steam, Epic, GOG and other fullscreen games. Each game's DualSense support is looked up on [PCGamingWiki](https://www.pcgamingwiki.com).
+- **Game library:** installed games from Steam, Epic, GOG, Ubisoft Connect, Xbox, EA and Battle.net, plus every game inside your game folders (any `Games` folder on a drive is picked up automatically). Each game gets its own icon, and Steam games their cover art.
+- **Game detection:** the running game is found by its install folder, Steam's running-game status, or as a fullscreen 3D app. Helpers like crash reporters and anti-cheat launchers are ignored.
+- **PCGamingWiki matching:** each game's DualSense support is looked up on [PCGamingWiki](https://www.pcgamingwiki.com). Games outside a launcher are matched using their installer entry, Steam or GOG files, folder name and window title, with release-style names cleaned up first. A wrong or missing match can be fixed by searching PCGamingWiki from the game's page.
 - **Overlay:** shows what the current game supports when it starts. Press Ctrl+Alt+Z to show it again.
+- **PlayStation button prompt mods:** when PCGamingWiki lists a mod that adds PlayStation prompts, the game's page shows the steps and links, and the overlay mentions it.
 - **Per-game profiles:** controller mode, haptics and trigger strength, lightbar colour, audio haptics and trigger effects.
 - **Xbox 360 mode:** for games without DualSense support. Rumble plays as HD haptics or classic rumble, and the player number shows on the touchpad LEDs.
 - **Haptics from game audio:** the game's bass drives the grips in games without their own haptics. Only the game's audio is captured, not music or voice chat.
@@ -68,7 +71,7 @@ These run without the GUI. Use `dotnet ZerkSense5.dll` to skip the admin prompt.
 |---|---|
 | `--selftest` | Drives the virtual devices with a built-in USB/IP client and a simulated controller |
 | `--probe` | Talks to the paired controller: feature reports, input rate, a lightbar change and a short haptics buzz |
-| `--games [appid:name or title ...]` | Runs the PCGamingWiki lookup for installed Steam and Epic games, or for the given ones |
+| `--games [appid:name or title ...]` | Runs the PCGamingWiki lookup for every game in the library, or for the given ones |
 | `--capture [pid]` | Records 3 seconds of a process's audio, or all system audio, through the audio haptics filter |
 
 ## Settings
@@ -78,6 +81,7 @@ Everything is editable in the app and saved to `config.json` next to the executa
 ## Known limitations
 
 - The overlay doesn't appear over games running in exclusive fullscreen.
+- PCGamingWiki's cover images can't be downloaded by the app, so covers are shown for Steam games only.
 - A DualSense Edge is presented as a regular DualSense.
 - Audio quality depends on the Bluetooth adapter. If the speaker stutters, switch the packet mode to Single or raise the audio buffer.
 - Switching between DualSense and Xbox 360 mode while a game is running relies on the game handling controller hotplug.

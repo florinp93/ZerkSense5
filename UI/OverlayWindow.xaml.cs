@@ -105,6 +105,8 @@ sealed record FeatureRow(string Name, Support Support, string? StateOverride = n
 sealed class OverlayModel
 {
     public string Title { get; init; } = "";
+    public ImageSource? Icon { get; init; }
+    public bool HasIcon => Icon != null;
     public string Subtitle { get; init; } = "";
     public bool HasMode { get; init; }
     public string ModeText { get; init; } = "";
@@ -121,7 +123,7 @@ sealed class OverlayModel
     public bool Charging { get; init; }
     public string BatteryText => $"{BatteryPercent}%";
 
-    public static OverlayModel Build(GameSession? s, ControllerStatus? c, Config cfg)
+    public static OverlayModel Build(GameSession? s, ControllerStatus? c, Config cfg, ImageSource? icon = null)
     {
         bool battery = c != null && c.BatteryPercent > 0;
         if (s == null)
@@ -154,20 +156,24 @@ sealed class OverlayModel
             rows.Add(new FeatureRow("Lightbar", p.LightBar));
             rows.Add(new FeatureRow("Controller speaker", p.Speaker));
             rows.Add(new FeatureRow("Motion sensors", p.Motion));
-            rows.Add(new FeatureRow("PlayStation prompts", p.PlayStationPrompts));
+            rows.Add(new FeatureRow("PlayStation prompts", p.PlayStationPrompts,
+                p.PromptMod != null && p.PlayStationPrompts != Support.Yes ? "Mod available" : null));
         }
 
         string modeText = (s.Profile.Mode == ControllerMode.Auto ? "Recommended: " : "Profile: ") + (xbox ? "Xbox 360 mode" : "DualSense mode");
         return new OverlayModel
         {
             Title = s.Game.Name,
+            Icon = icon,
             Subtitle = s.LookingUp ? "Looking up PCGamingWiki…" : s.Verdict.Summary,
             HasMode = true,
             ModeText = modeText,
             ModeIcon = xbox ? "" : "",
             ModeBrush = new SolidColorBrush(xbox ? Color.FromRgb(0x10, 0x7C, 0x10) : Color.FromRgb(0x25, 0x63, 0xEB)),
             Features = rows,
-            Callout = p?.WiredOnly == true && p.SupportsDualSense ? "✓  Wired-only features unlocked over Bluetooth" : "",
+            Callout = p?.PromptMod != null && !xbox && p.PlayStationPrompts != Support.Yes
+                ? "PlayStation button prompts mod available. Open Zerk Sense 5 for the link and steps."
+                : p?.WiredOnly == true && p.SupportsDualSense ? "✓  Wired-only features unlocked over Bluetooth" : "",
             Source = p != null ? "Source: PCGamingWiki" : s.Game.Source,
             HasBattery = battery,
             BatteryPercent = c?.BatteryPercent ?? 0,

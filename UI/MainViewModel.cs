@@ -51,6 +51,7 @@ sealed partial class MainViewModel : INotifyPropertyChanged
         });
         InitGames(showOverlay);
         InitEffects();
+        InitLibrary();
         Refresh();
     }
 

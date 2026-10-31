@@ -1,12 +1,11 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
-using System.Text.Json;
-using System.Text.RegularExpressions;
+using System.Text;
 using Microsoft.Win32;
 
 namespace ZerkSense5.Games;
 
-sealed record GameInfo(string Key, string Name, string Source, int? SteamAppId, string ExePath, int ProcessId);
+sealed record GameInfo(string Key, string Name, string Source, int? SteamAppId, string ExePath, int ProcessId, string[]? Aliases = null);
 
 sealed class GameDetector : IDisposable
 {
@@ -15,6 +14,9 @@ sealed class GameDetector : IDisposable
     [DllImport("user32.dll")] static extern bool GetWindowRect(nint hwnd, out RECT r);
     [DllImport("user32.dll")] static extern nint MonitorFromWindow(nint hwnd, uint flags);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] static extern bool GetMonitorInfoW(nint mon, ref MONITORINFO mi);
+    [DllImport("kernel32.dll", SetLastError = true)] static extern nint OpenProcess(uint access, bool inherit, int pid);
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)] static extern bool QueryFullProcessImageNameW(nint h, int flags, StringBuilder name, ref int size);
+    [DllImport("kernel32.dll")] static extern bool CloseHandle(nint h);
 
     [StructLayout(LayoutKind.Sequential)] struct RECT { public int L, T, R, B; }
     [StructLayout(LayoutKind.Sequential)] struct MONITORINFO { public int cbSize; public RECT rcMonitor, rcWork; public int dwFlags; }
@@ -32,32 +34,71 @@ sealed class GameDetector : IDisposable
 
     static readonly string[] GraphicsModules = ["d3d9.dll", "d3d11.dll", "d3d12.dll", "vulkan-1.dll", "opengl32.dll"];
 
-    readonly Func<bool> _detectFullscreen;
+    static readonly HashSet<string> GenericNames = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "game", "unrealgame", "unity", "unity player", "launcher", "application", "client", "main", "app", "default",
+    };
+
+    readonly Config _cfg;
     readonly Timer _timer;
-    readonly Dictionary<int, GameInfo?> _seen = new();
-    readonly List<(string dir, string name, string appName)> _epic = new();
-    DateTime _epicLoaded;
+    readonly object _lock = new();
+    readonly HashSet<int> _notFullscreenGames = new();
+    List<LibraryGame> _library = new();
+    IReadOnlyDictionary<string, string> _uninstall = new Dictionary<string, string>();
+    DateTime _libraryScanned;
     GameInfo? _current;
     Process? _currentProcess;
+    int _busy;
 
-    public event Action<GameInfo>? GameStarted;
-    public event Action<GameInfo>? GameStopped;
-    public GameInfo? Current => _current;
-
-    public GameDetector(Func<bool> detectFullscreenApps)
+    public GameDetector(Config cfg)
     {
-        _detectFullscreen = detectFullscreenApps;
+        _cfg = cfg;
         _timer = new Timer(_ => Tick(), null, 1000, 2000);
     }
 
-    int _busy;
+    public event Action<GameInfo>? GameStarted;
+    public event Action<GameInfo>? GameStopped;
+    public event Action? LibraryChanged;
+
+    public GameInfo? Current => _current;
+
+    public IReadOnlyList<LibraryGame> Library
+    {
+        get
+        {
+            lock (_lock) return _library;
+        }
+    }
+
+    public void RescanLibrary()
+    {
+        List<LibraryGame> games;
+        List<string> folders;
+        lock (_cfg.GameFolders) folders = _cfg.GameFolders.ToList();
+        lock (_cfg.CustomGames) games = GameLibrary.Scan(_cfg.CustomGames.ToList(), folders);
+        _uninstall = GameNames.UninstallNames();
+        lock (_lock)
+        {
+            _library = games;
+            _libraryScanned = DateTime.UtcNow;
+        }
+        LibraryChanged?.Invoke();
+    }
 
     void Tick()
     {
         if (Interlocked.Exchange(ref _busy, 1) == 1) return;
         try
         {
-            TickCore();
+            if (DateTime.UtcNow - _libraryScanned > TimeSpan.FromMinutes(5))
+            {
+                RescanLibrary();
+                _notFullscreenGames.Clear();
+            }
+            Detect();
+        }
+        catch (Exception e) when (e is InvalidOperationException or ArgumentException or System.ComponentModel.Win32Exception)
+        {
         }
         finally
         {
@@ -65,143 +106,110 @@ sealed class GameDetector : IDisposable
         }
     }
 
-    void TickCore()
+    void Detect()
     {
-        try
+        if (_current != null && (_currentProcess == null || _currentProcess.HasExited))
         {
-            if (_current != null && (_currentProcess == null || _currentProcess.HasExited))
-            {
-                var ended = _current;
-                _current = null;
-                _currentProcess?.Dispose();
-                _currentProcess = null;
-                GameStopped?.Invoke(ended);
-            }
-
-            nint hwnd = GetForegroundWindow();
-            if (hwnd == 0) return;
-            GetWindowThreadProcessId(hwnd, out int pid);
-            if (pid == 0 || pid == Environment.ProcessId || pid == _current?.ProcessId) return;
-
-            if (!_seen.TryGetValue(pid, out var game))
-            {
-                game = Classify(pid, hwnd);
-                if (game != null) _seen[pid] = game;
-                if (_seen.Count > 512) _seen.Clear();
-            }
-            if (game == null) return;
-
-            if (_current != null) GameStopped?.Invoke(_current);
+            var ended = _current;
+            _current = null;
             _currentProcess?.Dispose();
-            _currentProcess = Process.GetProcessById(pid);
-            _current = game;
-            GameStarted?.Invoke(game);
+            _currentProcess = null;
+            GameStopped?.Invoke(ended);
         }
-        catch (Exception e) when (e is InvalidOperationException or ArgumentException or System.ComponentModel.Win32Exception)
-        {
-        }
+
+        var found = FromForeground() ?? FromSteamRunning() ?? FromLibraryProcesses();
+        if (found == null || found.Key == _current?.Key && found.ProcessId == _current.ProcessId) return;
+        if (_current != null && found.Key != _current.Key && !IsForeground(found.ProcessId)) return;
+
+        if (_current != null) GameStopped?.Invoke(_current);
+        _currentProcess?.Dispose();
+        _currentProcess = Process.GetProcessById(found.ProcessId);
+        _current = found;
+        GameStarted?.Invoke(found);
     }
 
-    GameInfo? Classify(int pid, nint hwnd)
+    bool Ignored(string key)
     {
+        lock (_cfg.IgnoredGames) return _cfg.IgnoredGames.Contains(key);
+    }
+
+    static bool IsForeground(int pid)
+    {
+        GetWindowThreadProcessId(GetForegroundWindow(), out int fg);
+        return fg == pid;
+    }
+
+    GameInfo? FromForeground()
+    {
+        nint hwnd = GetForegroundWindow();
+        if (hwnd == 0) return null;
+        GetWindowThreadProcessId(hwnd, out int pid);
+        if (pid == 0 || pid == Environment.ProcessId) return null;
+        if (_current?.ProcessId == pid) return _current;
+        string? exe = PathOf(pid);
+        if (exe == null || NotGames.Contains(Path.GetFileNameWithoutExtension(exe))) return null;
+        return FromLibrary(exe, pid) ?? FromFullscreen(pid, exe, hwnd);
+    }
+
+    GameInfo? FromSteamRunning()
+    {
+        if (Registry.GetValue(@"HKEY_CURRENT_USER\Software\Valve\Steam", "RunningAppID", 0) is not int appId || appId == 0) return null;
+        var game = Library.FirstOrDefault(g => g.SteamAppId == appId);
+        if (game == null || Ignored(game.Key)) return null;
+        var main = MainProcessIn(game);
+        return main == null ? null : Info(game, main.Value.exe, main.Value.pid);
+    }
+
+    GameInfo? FromLibraryProcesses()
+    {
+        foreach (var p in Process.GetProcesses())
+        {
+            using (p)
+            {
+                if (p.Id == Environment.ProcessId || p.MainWindowHandle == 0) continue;
+                string? exe = PathOf(p.Id);
+                if (exe == null) continue;
+                var game = FromLibrary(exe, p.Id);
+                if (game != null) return game;
+            }
+        }
+        return null;
+    }
+
+    (int pid, string exe)? MainProcessIn(LibraryGame game)
+    {
+        (int pid, string exe, long memory)? best = null;
+        foreach (var p in Process.GetProcesses())
+        {
+            using (p)
+            {
+                if (p.MainWindowHandle == 0) continue;
+                string? exe = PathOf(p.Id);
+                if (exe == null || !game.Contains(exe) || GameLibrary.IsHelper(exe)) continue;
+                long memory = p.WorkingSet64;
+                if (best == null || memory > best.Value.memory) best = (p.Id, exe, memory);
+            }
+        }
+        return best is { } b ? (b.pid, b.exe) : null;
+    }
+
+    GameInfo? FromLibrary(string exe, int pid)
+    {
+        if (GameLibrary.IsHelper(exe)) return null;
+        var game = Library.FirstOrDefault(g => string.Equals(g.Exe, exe, StringComparison.OrdinalIgnoreCase))
+                   ?? Library.FirstOrDefault(g => g.Contains(exe));
+        if (game == null || Ignored(game.Key)) return null;
+        return Info(game, exe, pid);
+    }
+
+    static GameInfo Info(LibraryGame g, string exe, int pid) => new(g.Key, g.Name, g.Source, g.SteamAppId, exe, pid, g.Aliases);
+
+    GameInfo? FromFullscreen(int pid, string exe, nint hwnd)
+    {
+        if (!_cfg.DetectFullscreenApps || _notFullscreenGames.Contains(pid) || !IsFullscreen(hwnd)) return null;
+        string key = GameLibrary.CustomKey(exe);
+        if (Ignored(key)) return null;
         using var p = Process.GetProcessById(pid);
-        if (NotGames.Contains(p.ProcessName)) return null;
-        string? exe;
-        try
-        {
-            exe = p.MainModule?.FileName;
-        }
-        catch (System.ComponentModel.Win32Exception)
-        {
-            return null;
-        }
-        if (string.IsNullOrEmpty(exe)) return null;
-
-        return FromSteam(exe, pid) ?? FromEpic(exe, pid) ?? FromGog(exe, pid) ?? FromFullscreen(p, exe, hwnd);
-    }
-
-    static GameInfo? FromSteam(string exe, int pid)
-    {
-        var m = Regex.Match(exe, @"^(.*\\steamapps)\\common\\([^\\]+)\\", RegexOptions.IgnoreCase);
-        if (!m.Success) return null;
-        string steamapps = m.Groups[1].Value, folder = m.Groups[2].Value;
-        foreach (var acf in Directory.EnumerateFiles(steamapps, "appmanifest_*.acf"))
-        {
-            string text;
-            try
-            {
-                text = File.ReadAllText(acf);
-            }
-            catch (IOException)
-            {
-                continue;
-            }
-            if (!string.Equals(Vdf(text, "installdir"), folder, StringComparison.OrdinalIgnoreCase)) continue;
-            int.TryParse(Vdf(text, "appid"), out int appId);
-            string name = Vdf(text, "name") ?? folder;
-            return new GameInfo($"steam:{appId}", name, "Steam", appId, exe, pid);
-        }
-        return new GameInfo("exe:" + Path.GetFileName(exe).ToLowerInvariant(), folder, "Steam", null, exe, pid);
-    }
-
-    static string? Vdf(string text, string key)
-    {
-        var m = Regex.Match(text, $"\"{key}\"\\s+\"([^\"]*)\"", RegexOptions.IgnoreCase);
-        return m.Success ? m.Groups[1].Value : null;
-    }
-
-    GameInfo? FromEpic(string exe, int pid)
-    {
-        if (DateTime.UtcNow - _epicLoaded > TimeSpan.FromMinutes(5)) LoadEpic();
-        foreach (var (dir, name, appName) in _epic)
-            if (exe.StartsWith(dir, StringComparison.OrdinalIgnoreCase))
-                return new GameInfo($"epic:{appName}", name, "Epic Games", null, exe, pid);
-        return null;
-    }
-
-    void LoadEpic()
-    {
-        _epicLoaded = DateTime.UtcNow;
-        _epic.Clear();
-        var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
-            "Epic", "EpicGamesLauncher", "Data", "Manifests");
-        if (!Directory.Exists(dir)) return;
-        foreach (var item in Directory.EnumerateFiles(dir, "*.item"))
-        {
-            try
-            {
-                using var doc = JsonDocument.Parse(File.ReadAllText(item));
-                var root = doc.RootElement;
-                string? loc = root.TryGetProperty("InstallLocation", out var l) ? l.GetString() : null;
-                string? name = root.TryGetProperty("DisplayName", out var n) ? n.GetString() : null;
-                string? app = root.TryGetProperty("AppName", out var a) ? a.GetString() : null;
-                if (string.IsNullOrEmpty(loc) || name == null || app == null) continue;
-                _epic.Add((loc.Replace('/', '\\').TrimEnd('\\') + "\\", name, app));
-            }
-            catch (Exception e) when (e is IOException or JsonException)
-            {
-            }
-        }
-    }
-
-    static GameInfo? FromGog(string exe, int pid)
-    {
-        using var games = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\WOW6432Node\GOG.com\Games");
-        if (games == null) return null;
-        foreach (var id in games.GetSubKeyNames())
-        {
-            using var k = games.OpenSubKey(id);
-            if (k?.GetValue("path") is not string path || string.IsNullOrEmpty(path)) continue;
-            if (!exe.StartsWith(path.TrimEnd('\\') + "\\", StringComparison.OrdinalIgnoreCase)) continue;
-            string name = k.GetValue("gameName") as string ?? Path.GetFileName(path.TrimEnd('\\'));
-            return new GameInfo($"gog:{id}", name, "GOG", null, exe, pid);
-        }
-        return null;
-    }
-
-    GameInfo? FromFullscreen(Process p, string exe, nint hwnd)
-    {
-        if (!_detectFullscreen() || !IsFullscreen(hwnd)) return null;
         bool graphics;
         try
         {
@@ -209,17 +217,35 @@ sealed class GameDetector : IDisposable
         }
         catch (Exception e) when (e is System.ComponentModel.Win32Exception or InvalidOperationException)
         {
+            graphics = false;
+        }
+        if (!graphics)
+        {
+            _notFullscreenGames.Add(pid);
             return null;
         }
-        if (!graphics) return null;
-
-        return new GameInfo("exe:" + Path.GetFileName(exe).ToLowerInvariant(), NameFor(p, exe), "Fullscreen app", null, exe, p.Id);
+        string seen = NameFor(p, exe);
+        var id = GameNames.Identify(GameNames.GameRoot(exe), _uninstall);
+        var aliases = id.Aliases.Append(GameNames.Clean(seen)).Append(GameNames.Clean(p.MainWindowTitle))
+            .Where(n => n.Length > 1).Distinct(StringComparer.OrdinalIgnoreCase).ToArray();
+        return new GameInfo(key, aliases.FirstOrDefault() ?? seen, "Fullscreen app", id.SteamAppId, exe, pid, aliases);
     }
 
-    static readonly HashSet<string> GenericNames = new(StringComparer.OrdinalIgnoreCase)
+    static string? PathOf(int pid)
     {
-        "game", "unrealgame", "unity", "unity player", "launcher", "application", "client", "main", "app", "default",
-    };
+        nint h = OpenProcess(0x1000, false, pid);
+        if (h == 0) return null;
+        try
+        {
+            var sb = new StringBuilder(1024);
+            int size = sb.Capacity;
+            return QueryFullProcessImageNameW(h, 0, sb, ref size) ? sb.ToString() : null;
+        }
+        finally
+        {
+            CloseHandle(h);
+        }
+    }
 
     static string NameFor(Process p, string exe)
     {

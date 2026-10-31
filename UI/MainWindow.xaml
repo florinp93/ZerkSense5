@@ -313,15 +313,18 @@
             </ScrollViewer>
 
             <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavGames, Converter={StaticResource Visible}}">
-                <StackPanel Margin="36,30,36,24" MaxWidth="900">
+                <StackPanel Margin="36,30,36,24" MaxWidth="980">
                     <TextBlock Text="Games" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="Detects Steam, Epic, GOG and other fullscreen games, looks up their DualSense support on PCGamingWiki and applies their profiles." Style="{StaticResource PageSubtitle}" />
+                    <TextBlock Text="Detects installed and running games, looks up their DualSense support on PCGamingWiki and applies their profiles." Style="{StaticResource PageSubtitle}" />
 
                     <Border Style="{StaticResource CardBorder}" Background="{StaticResource HeroGradient}" Padding="24,20"
                             Visibility="{Binding HasGame, Converter={StaticResource Visible}}">
                         <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                            <StackPanel>
+                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                            <Border Width="56" Height="56" CornerRadius="12" Background="#22FFFFFF" VerticalAlignment="Top" Margin="0,4,18,0">
+                                <Image Source="{Binding GameIcon}" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality" />
+                            </Border>
+                            <StackPanel Grid.Column="1">
                                 <TextBlock Text="NOW PLAYING" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentLight}" />
                                 <TextBlock Text="{Binding GameTitle}" FontFamily="{StaticResource DisplayFont}" FontSize="24" FontWeight="SemiBold" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
                                 <TextBlock Text="{Binding GameSource}" Style="{StaticResource Hint}" />
@@ -332,9 +335,8 @@
                                 <TextBlock Text="{Binding GameModeNote}" Style="{StaticResource Hint}" Foreground="{StaticResource Warning}" Margin="0,4,0,0"
                                            Visibility="{Binding HasGameModeNote, Converter={StaticResource Visible}}" />
                             </StackPanel>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="20,0,0,0">
-                                <Button Content="Show overlay" Style="{StaticResource AccentButton}" Command="{Binding ShowOverlayNow}" Margin="0,0,0,8" />
-                                <Button Content="Refresh PCGW" Style="{StaticResource GhostButton}" Command="{Binding RefreshPcgw}" />
+                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="20,0,0,0">
+                                <Button Content="Show overlay" Style="{StaticResource AccentButton}" Command="{Binding ShowOverlayNow}" />
                             </StackPanel>
                         </Grid>
                     </Border>
@@ -350,26 +352,51 @@
                         </Grid>
                     </Border>
 
-                    <Grid Visibility="{Binding HasGames, Converter={StaticResource Visible}}">
+                    <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="270" />
+                            <ColumnDefinition Width="300" />
                             <ColumnDefinition Width="12" />
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Border Style="{StaticResource CardBorder}" Padding="10,14" VerticalAlignment="Top">
                             <StackPanel>
-                                <TextBlock Text="Your games" Style="{StaticResource CardTitle}" Margin="10,0,0,10" />
+                                <Grid Margin="10,0,6,10">
+                                    <TextBlock Text="Your games" Style="{StaticResource CardTitle}" />
+                                    <Button Content="Add game" Style="{StaticResource LinkButton}" Command="{Binding AddGame}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                                <Grid Margin="6,0,6,8">
+                                    <TextBox Text="{Binding GameFilter, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
+                                    <TextBlock Text="Search games" Foreground="#6B7385" FontSize="13" Margin="10,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
+                                               Visibility="{Binding FilterEmpty, Converter={StaticResource Visible}}" />
+                                </Grid>
+                                <Grid Margin="10,0,6,10">
+                                    <TextBlock Text="Show installed games" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="0" />
+                                    <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowInstalledGames}" />
+                                </Grid>
                                 <ListBox ItemsSource="{Binding GameList}" SelectedItem="{Binding SelectedGame}" Background="Transparent" BorderThickness="0"
-                                         ItemContainerStyle="{StaticResource GameItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" MaxHeight="520">
+                                         ItemContainerStyle="{StaticResource GameItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" MaxHeight="560"
+                                         VirtualizingPanel.IsVirtualizing="True">
                                     <ListBox.ItemTemplate>
                                         <DataTemplate>
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{StaticResource Text}" TextTrimming="CharacterEllipsis" />
-                                                <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{StaticResource Subtext}" Margin="0,2,0,0" />
-                                            </StackPanel>
+                                            <Grid>
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                                <Border Width="32" Height="32" CornerRadius="7" Background="#16FFFFFF" Margin="0,0,10,0">
+                                                    <Grid>
+                                                        <TextBlock Text="{Binding Initial}" FontWeight="SemiBold" Foreground="{StaticResource Subtext}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                   Visibility="{Binding HasIcon, Converter={StaticResource Hidden}}" />
+                                                        <Image Source="{Binding Icon}" Width="24" Height="24" RenderOptions.BitmapScalingMode="HighQuality" />
+                                                    </Grid>
+                                                </Border>
+                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                    <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{StaticResource Text}" TextTrimming="CharacterEllipsis" />
+                                                    <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{StaticResource Subtext}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                                                </StackPanel>
+                                            </Grid>
                                         </DataTemplate>
                                     </ListBox.ItemTemplate>
                                 </ListBox>
+                                <TextBlock Text="No games found. Use Add game to pick a game's .exe." Style="{StaticResource Hint}" Margin="10,4,10,4"
+                                           Visibility="{Binding HasGames, Converter={StaticResource Hidden}}" />
                             </StackPanel>
                         </Border>
 
@@ -377,16 +404,92 @@
                             <Border Style="{StaticResource CardBorder}">
                                 <StackPanel>
                                     <Grid>
-                                        <TextBlock Text="{Binding SelectedName}" Style="{StaticResource CardTitle}" FontSize="17" TextTrimming="CharacterEllipsis" Margin="0,0,90,0" />
-                                        <Button Content="Forget" Style="{StaticResource LinkButton}" Command="{Binding ForgetGame}" HorizontalAlignment="Right"
-                                                Visibility="{Binding CanForget, Converter={StaticResource Visible}}" />
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                        <Border CornerRadius="8" Margin="0,0,16,0" VerticalAlignment="Top" ClipToBounds="True"
+                                                Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
+                                            <Image Source="{Binding SelectedCover}" Width="92" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+                                        </Border>
+                                        <Border Width="56" Height="56" CornerRadius="12" Background="#16FFFFFF" Margin="0,0,16,0" VerticalAlignment="Top"
+                                                Visibility="{Binding HasCover, Converter={StaticResource Hidden}}">
+                                            <Image Source="{Binding SelectedIcon}" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality" />
+                                        </Border>
+                                        <StackPanel Grid.Column="1">
+                                            <TextBlock Text="{Binding SelectedName}" Style="{StaticResource CardTitle}" FontSize="18" TextWrapping="Wrap" />
+                                            <TextBlock Text="{Binding SelectedSource}" Style="{StaticResource Hint}" />
+                                            <WrapPanel Margin="0,10,0,0">
+                                                <TextBlock Text="{Binding MatchText}" FontSize="12" Foreground="{StaticResource Text}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" />
+                                                <Button Content="Change" Style="{StaticResource LinkButton}" Command="{Binding ToggleMatch}" VerticalAlignment="Center" />
+                                            </WrapPanel>
+                                            <TextBlock Text="{Binding SelectedVerdict}" Style="{StaticResource Hint}" Margin="0,6,0,0" />
+                                        </StackPanel>
                                     </Grid>
-                                    <TextBlock Text="{Binding SelectedVerdict}" Style="{StaticResource Hint}" Margin="0,4,0,8" />
-                                    <ItemsControl ItemsSource="{Binding SelectedRows}" ItemTemplate="{StaticResource FeatureRowTemplate}"
+
+                                    <Border Background="#0AFFFFFF" CornerRadius="8" Padding="12" Margin="0,14,0,0"
+                                            Visibility="{Binding Matching, Converter={StaticResource Visible}}">
+                                        <StackPanel>
+                                            <TextBlock Text="Match this game to a PCGamingWiki page" Style="{StaticResource Label}" FontSize="13" />
+                                            <Grid Margin="0,8,0,8">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <TextBox Text="{Binding MatchQuery, UpdateSourceTrigger=PropertyChanged}">
+                                                    <TextBox.InputBindings>
+                                                        <KeyBinding Key="Enter" Command="{Binding SearchMatch}" />
+                                                    </TextBox.InputBindings>
+                                                </TextBox>
+                                                <Button Grid.Column="1" Content="Search" Style="{StaticResource AccentButton}" Command="{Binding SearchMatch}" Margin="8,0,0,0" />
+                                            </Grid>
+                                            <TextBlock Text="Searching…" Style="{StaticResource Hint}" Visibility="{Binding Searching, Converter={StaticResource Visible}}" />
+                                            <ItemsControl ItemsSource="{Binding MatchResults}">
+                                                <ItemsControl.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Button Content="{Binding}" Style="{StaticResource LinkButton}" Margin="0,3" HorizontalAlignment="Left"
+                                                                Command="{Binding DataContext.PickMatch, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                    </DataTemplate>
+                                                </ItemsControl.ItemTemplate>
+                                            </ItemsControl>
+                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                <Button Content="Not on PCGamingWiki" Style="{StaticResource GhostButton}" Command="{Binding NoMatch}" Margin="0,0,8,0" />
+                                                <Button Content="Match automatically" Style="{StaticResource GhostButton}" Command="{Binding AutoMatch}" />
+                                            </StackPanel>
+                                        </StackPanel>
+                                    </Border>
+
+                                    <ItemsControl ItemsSource="{Binding SelectedRows}" ItemTemplate="{StaticResource FeatureRowTemplate}" Margin="0,12,0,0"
                                                   Visibility="{Binding HasSelectedPcgw, Converter={StaticResource Visible}}" />
-                                    <Button Content="Open on PCGamingWiki" Style="{StaticResource LinkButton}" HorizontalAlignment="Left" Margin="0,10,0,0"
-                                            Command="{Binding OpenUrl}" CommandParameter="{Binding SelectedPcgwUrl}"
-                                            Visibility="{Binding HasSelectedPcgw, Converter={StaticResource Visible}}" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                        <Button Content="Open on PCGamingWiki" Style="{StaticResource LinkButton}" Margin="0,0,18,0"
+                                                Command="{Binding OpenUrl}" CommandParameter="{Binding SelectedPcgwUrl}"
+                                                Visibility="{Binding HasSelectedPcgw, Converter={StaticResource Visible}}" />
+                                        <Button Content="Refresh" Style="{StaticResource LinkButton}" Command="{Binding RefreshPcgw}" Margin="0,0,18,0" />
+                                        <Button Content="Not a game" Style="{StaticResource LinkButton}" Command="{Binding NotAGame}" Foreground="{StaticResource Subtext}" />
+                                    </StackPanel>
+                                </StackPanel>
+                            </Border>
+
+                            <Border Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
+                                    Visibility="{Binding HasPromptMod, Converter={StaticResource Visible}}">
+                                <StackPanel>
+                                    <StackPanel Orientation="Horizontal">
+                                        <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="{StaticResource AccentLight}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                        <TextBlock Text="{Binding PromptModTitle}" Style="{StaticResource CardTitle}" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding PromptModText}" FontSize="13" Foreground="{StaticResource Text}" TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="20" />
+                                    <ItemsControl ItemsSource="{Binding PromptModLinks}" Margin="0,12,0,0">
+                                        <ItemsControl.ItemsPanel>
+                                            <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                                        </ItemsControl.ItemsPanel>
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Button Style="{StaticResource GhostButton}" Margin="0,0,8,8" ToolTip="{Binding Url}"
+                                                        Command="{Binding DataContext.OpenLink, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Url}">
+                                                    <StackPanel>
+                                                        <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+                                                        <TextBlock Text="{Binding Host}" FontSize="11" Foreground="{StaticResource Subtext}" />
+                                                    </StackPanel>
+                                                </Button>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                    <TextBlock Text="From PCGamingWiki. Mods are made by third parties; check their pages before installing." Style="{StaticResource Hint}" />
                                 </StackPanel>
                             </Border>
 
@@ -943,6 +1046,41 @@
                         </StackPanel>
                     </Border>
 
+                    <Border Style="{StaticResource CardBorder}">
+                        <StackPanel>
+                            <Grid Margin="0,0,0,4">
+                                <TextBlock Text="Game library" Style="{StaticResource CardTitle}" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                    <Button Content="Rescan" Style="{StaticResource GhostButton}" Command="{Binding RescanGames}" Margin="0,0,8,0" />
+                                    <Button Content="Add folder" Style="{StaticResource AccentButton}" Command="{Binding AddGameFolder}" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Text="Launcher games are found automatically. Every folder inside these folders counts as one game, named from its installer entry, Steam or GOG files, or the folder name." Style="{StaticResource Hint}" Margin="0,0,0,10" />
+                            <ItemsControl ItemsSource="{Binding GameFolders}">
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Grid Margin="0,4">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="{StaticResource AccentLight}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding Path}" FontSize="13" />
+                                                <TextBlock Text="{Binding Detail}" Style="{StaticResource Hint}" Margin="0" />
+                                            </StackPanel>
+                                            <Button Grid.Column="2" Content="Remove" Style="{StaticResource LinkButton}" VerticalAlignment="Center" CommandParameter="{Binding}"
+                                                    Command="{Binding DataContext.RemoveGameFolder, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                    Visibility="{Binding Auto, Converter={StaticResource Hidden}}" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                            <TextBlock Text="No game folders yet. Add the folder where you keep games that aren't in a launcher." Style="{StaticResource Hint}"
+                                       Visibility="{Binding HasGameFolders, Converter={StaticResource Hidden}}" />
+                            <Grid Margin="0,12,0,0" Visibility="{Binding HasHiddenGames, Converter={StaticResource Visible}}">
+                                <TextBlock Text="{Binding HiddenGamesText}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="0" />
+                                <Button Content="Show them again" Style="{StaticResource LinkButton}" Command="{Binding UnhideGames}" HorizontalAlignment="Right" />
+                            </Grid>
+                        </StackPanel>
+                    </Border>
                     <Border Style="{StaticResource CardBorder}">
                         <StackPanel>
                             <TextBlock Text="Game overlay" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />

@@ -128,46 +128,29 @@ static class Diagnostics
                 ? new GameInfo($"steam:{id}", parts[1], "Steam", id, "", 0)
                 : new GameInfo("exe:" + a, a, "Name", null, "", 0));
         }
-        if (games.Count == 0) AddInstalled(games);
+        if (games.Count == 0)
+            games.AddRange(GameLibrary.Scan([], []).Select(l => new GameInfo(l.Key, l.Name, l.Source, l.SteamAppId, "", 0, l.Aliases)));
 
         var client = new PcgwClient(Path.Combine(Path.GetTempPath(), "zs5-pcgw-test.json"));
         foreach (var g in games)
         {
-            var info = client.LookupAsync(g, refresh: true).GetAwaiter().GetResult();
+            var info = client.LookupAsync(new GameRef(g.Key, g.Name, g.SteamAppId, null, g.Aliases), refresh: true).GetAwaiter().GetResult();
             var v = Verdict.For(info);
-            Console.WriteLine($"{g.Name} [{g.Source}] -> {(info == null ? "no PCGW page" : info.Page)}");
+            Console.WriteLine($"{g.Name} [{g.Source}{(g.SteamAppId is int sid ? $", Steam {sid}" : "")}] -> {(info == null ? "no PCGW page" : info.Page)}");
+            if (g.Aliases is { Length: > 1 }) Console.WriteLine($"    aliases: {string.Join(" | ", g.Aliases)}");
             if (info != null)
                 Console.WriteLine($"    models={string.Join("/", info.PlayStationModels)} haptics={info.Haptics} triggers={info.AdaptiveTriggers} " +
                                   $"lightbar={info.LightBar} speaker={info.Speaker} xinput={info.XInput} conn=\"{info.ConnectionModes}\" wiredOnly={info.WiredOnly}");
             Console.WriteLine($"    => {v.Recommended}: {v.Summary}");
+            if (info?.CoverUrl != null) Console.WriteLine($"    cover: {info.CoverUrl}");
+            if (info?.PromptMod is { } mod)
+            {
+                Console.WriteLine("    PlayStation prompts mod:");
+                foreach (var line in mod.Text.Split('\n')) Console.WriteLine("      " + line);
+                foreach (var link in mod.Links) Console.WriteLine($"      -> {link.Label}: {link.Url}");
+            }
         }
         return 0;
-    }
-
-    static void AddInstalled(List<GameInfo> games)
-    {
-        var steam = @"C:\Program Files (x86)\Steam\steamapps";
-        var libs = new List<string> { steam };
-        var vdf = Path.Combine(steam, "libraryfolders.vdf");
-        if (File.Exists(vdf))
-            foreach (Match m in Regex.Matches(File.ReadAllText(vdf), @"""path""\s+""([^""]+)"""))
-                libs.Add(Path.Combine(m.Groups[1].Value.Replace(@"\\", @"\"), "steamapps"));
-        foreach (var lib in libs.Distinct(StringComparer.OrdinalIgnoreCase).Where(Directory.Exists))
-            foreach (var acf in Directory.EnumerateFiles(lib, "appmanifest_*.acf"))
-            {
-                var t = File.ReadAllText(acf);
-                var id = Regex.Match(t, @"""appid""\s+""(\d+)""").Groups[1].Value;
-                var name = Regex.Match(t, @"""name""\s+""([^""]+)""").Groups[1].Value;
-                if (id.Length > 0) games.Add(new GameInfo($"steam:{id}", name, "Steam", int.Parse(id), "", 0));
-            }
-        var epic = @"C:\ProgramData\Epic\EpicGamesLauncher\Data\Manifests";
-        if (Directory.Exists(epic))
-            foreach (var item in Directory.EnumerateFiles(epic, "*.item"))
-            {
-                using var doc = System.Text.Json.JsonDocument.Parse(File.ReadAllText(item));
-                var r = doc.RootElement;
-                games.Add(new GameInfo("epic:" + r.GetProperty("AppName").GetString(), r.GetProperty("DisplayName").GetString()!, "Epic Games", null, "", 0));
-            }
     }
 
     public static int SelfTest(Config cfg)
@@ -289,7 +272,6 @@ static class Diagnostics
             Check(mic.status == 0 && mic.data.Length == 1920, $"Iso IN mic URB returns 10 x 192 bytes ({mic.data.Length})");
             Check(mic.data.Any(b => b != 0), "Mic PCM decoded from controller Opus");
         }
-
 
         server.Device = null;
         var xbox = new VirtualXbox360(mock);
@@ -429,10 +411,57 @@ static class Diagnostics
             rum.Dispose();
         }
 
+        const string page = """
+            {{Input
+            |playstation prompts       = hackable
+            |playstation prompts notes = Uses generic prompts. PlayStation prompts can be used with [[#GInput|GInput]].
+            |light bar support         = false
+            }}
+
+            ===GInput===
+            {{Fixbox|description=Installing GInput|ref={{cn|date=2020-01-01}}|fix=
+            # Download GInputSA [https://example.com/ginput here].
+            # Copy {{file|GInputSA.asi}} into {{folder|{{p|game}}\scripts\}}.
+            '''Notes'''
+            {{ii}} Works with [[DsHidMini]].
+            }}
+
+            ===Something else===
+            Unrelated text.
+            """;
+        var fields = PcgwInfo.ParseInputTemplate(page);
+        var modWiki = PcgwInfo.ExtractPromptMod(page, fields);
+        var (modText, modLinks) = WikiText.Render(modWiki);
+        Check(modText.Contains("1. Download GInputSA here.") && modText.Contains("2. Copy GInputSA.asi into [game folder]\\scripts\\."),
+            "Prompt mod: section followed from the notes, steps numbered, paths readable");
+        Check(!modText.Contains("Unrelated") && !modText.Contains("{{") && !modText.Contains("[["), "Prompt mod: only the linked section, no wiki markup left");
+        Check(modLinks.Count == 1 && modLinks[0].Url == "https://example.com/ginput" && modLinks[0].Label == "here",
+            "Prompt mod: external link extracted");
+        Check(new PcgwInfo { Fields = fields, PromptModWiki = modWiki }.PromptMod != null, "Prompt mod: offered for a hackable game");
+        Check(GameLibrary.IsHelper(@"C:\Games\X\UnityCrashHandler64.exe") && !GameLibrary.IsHelper(@"C:\Games\X\Game.exe"),
+            "Game detection skips helper executables");
+
+        (string raw, string clean)[] names =
+        [
+            ("Call.of.Duty.MW4.SP", "Call of Duty MW4"),
+            ("1666Amsterdam", "1666 Amsterdam"),
+            ("DantesInferno", "Dantes Inferno"),
+            ("CONTROLResonant", "CONTROL Resonant"),
+            ("X-Men Destiny version 0.1.0-alpha.2", "X-Men Destiny"),
+            ("Some.Game.v1.2.3-CODEX", "Some Game"),
+            ("Some Game [FitGirl Repack]", "Some Game"),
+            ("Grand_Theft_Auto_V", "Grand Theft Auto V"),
+            ("uncharted-windows", "uncharted"),
+            ("Gears of War E Day", "Gears of War E Day"),
+            ("Half-Life 2", "Half-Life 2"),
+            ("METRO 2033 Redux Next Gen", "METRO 2033 Redux Next Gen"),
+        ];
+        var badNames = names.Where(n => GameNames.Clean(n.raw) != n.clean).Select(n => $"{n.raw} -> {GameNames.Clean(n.raw)}").ToList();
+        Check(badNames.Count == 0, "Game names cleaned from folders and release names" + (badNames.Count > 0 ? ": " + string.Join("; ", badNames) : ""));
+
         Log.Info(failures == 0 ? "Self-test passed" : $"Self-test: {failures} failure(s)");
         return failures == 0 ? 0 : 1;
     }
-
 
     sealed class TestClient : IDisposable
     {

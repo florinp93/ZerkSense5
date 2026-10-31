@@ -49,6 +49,10 @@ sealed class Config
     public int OverlaySeconds { get; set; } = 8;
     public bool DetectFullscreenApps { get; set; } = true;
     public Dictionary<string, GameProfile> Games { get; set; } = new();
+    public List<CustomGame> CustomGames { get; set; } = new();
+    public HashSet<string> IgnoredGames { get; set; } = new();
+    public List<string> GameFolders { get; set; } = new();
+    public bool ShowInstalledGames { get; set; } = true;
 
     public bool StartMinimized { get; set; }
     public bool LowBatteryAlert { get; set; } = true;
@@ -115,5 +119,8 @@ sealed class Config
 
         OverlaySeconds = Math.Clamp(OverlaySeconds, 3, 30);
         Games ??= new();
+        CustomGames ??= new();
+        IgnoredGames ??= new();
+        GameFolders ??= new();
     }
 }
