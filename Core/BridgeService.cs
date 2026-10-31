@@ -48,6 +48,8 @@ sealed class BridgeService : IDisposable
     LoopbackCapture? _capture;
     int? _captureTarget;
     int _reports;
+    long _lastReport;
+    const int SilenceMs = 3000;
 
     public BridgeService(Config config)
     {
@@ -83,6 +85,14 @@ sealed class BridgeService : IDisposable
     public bool MicStreamOpen => _device?.MicStreamOpen ?? false;
 
     public void Start() => _thread.Start();
+
+    public void EnterDemo(ControllerStatus controller)
+    {
+        Controller = controller;
+        State = BridgeState.Attached;
+        UsbipInstalled = HidHideInstalled = ControllerHidden = true;
+        Raise();
+    }
 
     public void SetMode(ControllerMode mode)
     {
@@ -219,11 +229,16 @@ sealed class BridgeService : IDisposable
         var gone = new ManualResetEventSlim();
         bt.Disconnected += gone.Set;
         bt.InputReport += OnInput;
+        long opened = Environment.TickCount64;
+        Interlocked.Exchange(ref _lastReport, 0);
         bt.Start();
         bt.InitFeatures();
-        if (!bt.Alive)
+        while (bt.Alive && Interlocked.Read(ref _lastReport) < opened && Environment.TickCount64 - opened < SilenceMs)
+            Thread.Sleep(50);
+        if (!bt.Alive || Interlocked.Read(ref _lastReport) < opened)
         {
-            _quit.Wait(1000);
+            bt.InputReport -= OnInput;
+            _quit.Wait(2000);
             return;
         }
 
@@ -251,8 +266,16 @@ sealed class BridgeService : IDisposable
             var mode = _wantedMode;
             PlugIn(bt, mode, usbip);
             int which;
-            do which = WaitHandle.WaitAny([gone.WaitHandle, _quit.WaitHandle, _modeChanged]);
-            while (which == 2 && _wantedMode == mode);
+            do
+            {
+                which = WaitHandle.WaitAny([gone.WaitHandle, _quit.WaitHandle, _modeChanged], 500);
+                if (which == WaitHandle.WaitTimeout && Environment.TickCount64 - Interlocked.Read(ref _lastReport) > SilenceMs)
+                {
+                    Log.Info("Controller stopped responding; treating it as turned off");
+                    which = 0;
+                }
+            }
+            while (which == WaitHandle.WaitTimeout || which == 2 && _wantedMode == mode);
             if (which != 2) break;
             Log.Info(_wantedMode == ControllerMode.Xbox360 ? "Switching to Xbox 360 mode" : "Switching to DualSense mode");
             Unplug(usbip);
@@ -322,6 +345,7 @@ sealed class BridgeService : IDisposable
 
     void OnInput(byte[] buf, int len)
     {
+        Interlocked.Exchange(ref _lastReport, Environment.TickCount64);
         if (len < 2 + 63 || buf[0] != 0x31 || (buf[1] & 0x02) != 0) return;
         Interlocked.Increment(ref _reports);
         if (Controller is not { } c) return;
