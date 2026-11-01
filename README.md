@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="docs/banner.png" alt="Zerk Sense 5: a Bluetooth DualSense on Windows, with everything the cable gives you" />
+  <img src="docs/images/banner.png" alt="Zerk Sense 5: a Bluetooth DualSense on Windows, with everything the cable gives you" />
 </p>
 
 <p align="center">
@@ -20,7 +20,7 @@ The idea comes from [DS5Dongle](https://github.com/awalol/DS5Dongle), which does
 
 > **Alpha.** This is an early pre-release. Expect rough edges, and please [open an issue](https://github.com/florinp93/ZerkSense5/issues) when something doesn't work.
 
-![Home](docs/screenshots/overview.png)
+![Home](docs/images/home.png)
 
 ## How it works
 
@@ -51,15 +51,15 @@ For games without DualSense support it can plug in a virtual **Xbox 360 controll
 
 | Games | Overlay |
 |---|---|
-| ![Games](docs/screenshots/games.png) | ![Overlay](docs/screenshots/overlay.png) |
+| ![Games](docs/images/games.png) | ![Overlay](docs/images/overlay.png) |
 
 | PlayStation prompt mods | Trigger Lab |
 |---|---|
-| ![Prompt mods](docs/screenshots/prompt-mod.png) | ![Trigger Lab](docs/screenshots/trigger-lab.png) |
+| ![Prompt mods](docs/images/prompt-mod.png) | ![Trigger Lab](docs/images/trigger-lab.png) |
 
 | Haptics from game audio | Lighting |
 |---|---|
-| ![Audio haptics](docs/screenshots/audio-haptics.png) | ![Lighting](docs/screenshots/lighting.png) |
+| ![Audio haptics](docs/images/audio-haptics.png) | ![Lighting](docs/images/lighting.png) |
 
 The screenshots use the built-in showcase mode (`ZerkSense5.exe --demo`) with sample games.
 
