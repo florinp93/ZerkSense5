@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- DSX mod support: mods written for DSX drive the adaptive triggers, lightbar, player LEDs and mic LED without DSX installed. Can be turned off on the Triggers page.
+- Live controller view on the Home page: buttons, sticks, triggers, touchpad and lightbar light up as you use the controller.
+- `--latency` diagnostic that measures the input latency and jitter the bridge adds, in DualSense or Xbox 360 mode.
+
+### Changed
+- New look: warm dark theme with an orange accent, a top tab bar instead of the sidebar, and a Home page built around the controller.
+- The demo mode (`--demo`) shows sample controller input.
+
 ## [0.6.0-alpha.3] - 2026-11-01
 
 ### Changed

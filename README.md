@@ -20,7 +20,7 @@ The idea comes from [DS5Dongle](https://github.com/awalol/DS5Dongle), which does
 
 > **Alpha.** This is an early pre-release. Expect rough edges, and please [open an issue](https://github.com/florinp93/ZerkSense5/issues) when something doesn't work.
 
-![Overview](docs/screenshots/overview.png)
+![Home](docs/screenshots/overview.png)
 
 ## How it works
 
@@ -31,6 +31,8 @@ For games without DualSense support it can plug in a virtual **Xbox 360 controll
 ## Features
 
 - **Wired features over Bluetooth:** HD haptics, speaker, headset jack, microphone, adaptive triggers and lightbar.
+- **Live controller view:** the Home page draws the DualSense and lights up buttons, sticks, triggers, touchpad and lightbar as you use it, next to the trigger effects in use.
+- **DSX mods:** game mods made for DSX drive the adaptive triggers and lights without DSX installed. See [DSX mods](#dsx-mods).
 - **Battery:** level and charging state in the app and in the tray icon, plus a low battery alert.
 - **Game library:** installed games from Steam, Epic, GOG, Ubisoft Connect, Xbox, EA and Battle.net, plus every game inside your game folders (any `Games` folder on a drive is picked up automatically). Each game gets its own icon, and Steam games their cover art.
 - **Game detection:** the running game is found by its install folder, Steam's running-game status, or as a fullscreen 3D app. Helpers like crash reporters and anti-cheat launchers are ignored.
@@ -78,6 +80,41 @@ The screenshots use the built-in showcase mode (`ZerkSense5.exe --demo`) with sa
 
 The virtual controller is plugged in when the DualSense connects and removed when it disconnects or is switched off. Closing the window keeps the app running in the tray. Use the tray menu to exit.
 
+## DSX mods
+
+Many games get adaptive triggers and lighting from mods written for [DSX](https://github.com/Paliverse/DualSenseX). Those mods send their effects to DSX over a local connection. Zerk Sense 5 listens for the same messages, so the mods work without DSX.
+
+1. Close DSX if it's installed. Both apps use port 6969, and only one can listen on it.
+2. In Zerk Sense 5, check that **DSX mods** is on (Triggers page). It's on by default.
+3. Install the mod as its page describes, but skip installing or starting DSX.
+4. Start the game. The Home page shows **DSX mods: Active** once the mod connects.
+
+Notes:
+
+- Mods work in both DualSense and Xbox 360 mode. Most DSX mods are for games without DualSense support, which Auto runs in Xbox 360 mode.
+- A mod's trigger effects take priority over the game profile's custom effects and over rumble on the triggers. They are cleared when the game closes.
+- Supported: trigger effects (including custom values), lightbar colour, player LEDs, mic LED and reset to user settings. The reply mods wait for includes the real battery level.
+- Mods written for the newer DSX v3 protocol only aren't supported yet.
+- Mods that talk to the controller themselves instead of through DSX don't need this. They see the virtual wired DualSense in DualSense mode, as they would a USB-connected controller.
+
+## Latency and jitter
+
+Bridging adds about **0.04 ms** of input latency, and no jitter of its own.
+
+| Mode | Reports measured | Median | p95 | p99 | Dropped reports |
+|---|---|---|---|---|---|
+| DualSense | 18,319 | 37 µs | 48 µs | 62 µs | 0 |
+| Xbox 360 | 19,097 | 35 µs | 45 µs | 59 µs | 0 |
+
+The controller sent about 800 reports a second, one every 1.25 ms. Most reports arrived on time, but about 1 in 100 came after a gap of 11 to 15 ms, occasionally up to 25 ms. Those gaps were already there in the controller's own timestamps and on arrival over Bluetooth, before the bridge. The virtual controller passed them through unchanged: the spread of report intervals was the same going in and coming out (standard deviation 2,176 µs in, 2,175 µs out in DualSense mode). A game reading the DualSense directly over Bluetooth would see the same gaps.
+
+**How it was measured.** One DualSense over Bluetooth, 30 seconds per mode, with the built-in `--latency` diagnostic. Every Bluetooth report was timestamped as it reached the app, which is when a game reading the controller directly over Bluetooth would get it. The same report was timestamped again when it came out of the virtual controller:
+
+- **DualSense mode:** read from the virtual wired DualSense as a HID device, the way games read it. Reports were paired by the controller's packet number and timestamp, which pass through unchanged.
+- **Xbox 360 mode:** read through XInput, checked continuously while the sticks moved. Each change was paired with the latest Bluetooth report that produced the same buttons, triggers and stick positions.
+
+Both timestamps come from the same high-resolution clock. The time from pressing a button to the report reaching Windows is the same with or without the bridge, so it isn't part of the measurement. To measure your own setup, see `--latency` under [Diagnostics](#diagnostics).
+
 ## Building
 
 ```
@@ -103,6 +140,7 @@ These run without the GUI. Use `dotnet ZerkSense5.dll` to skip the admin prompt.
 | `--probe` | Talks to the paired controller: feature reports, input rate, a lightbar change and a short haptics buzz |
 | `--games [appid:name or title ...]` | Runs the PCGamingWiki lookup for every game in the library, or for the given ones |
 | `--capture [pid]` | Records 3 seconds of a process's audio, or all system audio, through the audio haptics filter |
+| `--latency [seconds] [--xbox]` | Measures the latency and jitter the bridge adds, in DualSense or Xbox 360 mode. Needs an admin terminal and the app closed; saves a report next to the executable |
 
 ## Settings
 
@@ -121,6 +159,7 @@ Everything is editable in the app and saved to `config.json` next to the executa
 - [DS5Dongle](https://github.com/awalol/DS5Dongle) by awalol for the Bluetooth and USB protocol details
 - [GP2040-CE](https://github.com/OpenStickCommunity/GP2040-CE) for the Xbox 360 USB descriptors
 - [Concentus](https://github.com/lostromb/concentus) for Opus encoding and decoding
+- [dualsense-tester](https://github.com/daidr/dualsense-tester) by daidr for the controller artwork
 - [PCGamingWiki](https://www.pcgamingwiki.com) for game controller data
 - [usbip-win2](https://github.com/vadimgrn/usbip-win2) and [HidHide](https://github.com/nefarius/HidHide)
 
