@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0-alpha.3] - 2026-11-01
+
+### Changed
+- Updates are checked at launch, before the main window opens. If a newer version is available, an update window offers Update now, Not now or Skip this version. Update now downloads, verifies and restarts straight into the new version.
+- Updates found while the app is running download in the background, and a banner at the top of every page offers to restart into the new version.
+- The controller bridge starts after the update check, so an update no longer connects the controller only to drop it again.
+
+### Fixed
+- Clicking a tray notification now opens the app.
+- The update button was only on the Overview page. It is now also in Settings, next to the update status.
+
 ## [0.6.0-alpha.2] - 2026-11-01
 
 ### Fixed
@@ -36,5 +47,6 @@ First public pre-release.
 - A DualSense Edge is presented as a regular DualSense.
 - Covers are shown for Steam games only.
 
+[0.6.0-alpha.3]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.3
 [0.6.0-alpha.2]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.2
 [0.6.0-alpha.1]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.1
