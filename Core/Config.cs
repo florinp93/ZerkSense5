@@ -40,6 +40,8 @@ sealed class Config
     public TriggerEffect? TriggerL { get; set; }
     public TriggerEffect? TriggerR { get; set; }
     public List<TriggerEffect> SavedEffects { get; set; } = new();
+    public bool DsxMods { get; set; } = true;
+    public int DsxPort { get; set; } = 6969;
 
     public byte[] LightbarColor { get; set; } = [0xFF, 0xD7, 0x00];
     public int LightingMode { get; set; }
@@ -116,6 +118,7 @@ sealed class Config
         TriggerReduce = Math.Clamp(TriggerReduce, 0, 10);
         if (TriggerKick is < 0 or > 2) TriggerKick = 0;
         SavedEffects ??= new();
+        if (DsxPort is < 1024 or > 65535) DsxPort = 6969;
 
         if (LightbarColor is not { Length: 3 }) LightbarColor = [0xFF, 0xD7, 0x00];
         if (LightingMode is < 0 or > 4) LightingMode = 0;

@@ -6,7 +6,7 @@
         Topmost="True" ShowInTaskbar="False" ShowActivated="False" ResizeMode="NoResize"
         SizeToContent="WidthAndHeight" FontFamily="{StaticResource UiFont}" Foreground="{StaticResource Text}"
         UseLayoutRounding="True" Opacity="0">
-    <Border x:Name="Card" Width="372" Margin="24" CornerRadius="14" BorderThickness="1" BorderBrush="#33FFFFFF" Background="#EB111419">
+    <Border x:Name="Card" Width="372" Margin="24" CornerRadius="14" BorderThickness="1" BorderBrush="#33FFFFFF" Background="#EB14110F">
         <Border.Effect>
             <DropShadowEffect BlurRadius="24" ShadowDepth="4" Opacity="0.5" />
         </Border.Effect>
@@ -51,7 +51,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Border Width="18" Height="18" CornerRadius="9" Background="{Binding Brush}" VerticalAlignment="Center" HorizontalAlignment="Left">
-                                <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="9" Foreground="#111419"
+                                <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="9" Foreground="#14110F"
                                            HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" />
                             </Border>
                             <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" VerticalAlignment="Center" />
@@ -66,8 +66,8 @@
 
             <Border Height="1" Background="#22FFFFFF" Margin="0,14,0,10" />
             <Grid>
-                <TextBlock Text="{Binding Source}" FontSize="11" Foreground="#6B7385" />
-                <TextBlock Text="Ctrl+Alt+Z" FontSize="11" Foreground="#6B7385" HorizontalAlignment="Right" />
+                <TextBlock Text="{Binding Source}" FontSize="11" Foreground="#6E655D" />
+                <TextBlock Text="Ctrl+Alt+Z" FontSize="11" Foreground="#6E655D" HorizontalAlignment="Right" />
             </Grid>
         </StackPanel>
     </Border>

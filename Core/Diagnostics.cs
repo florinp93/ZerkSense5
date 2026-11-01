@@ -399,6 +399,46 @@ static class Diagnostics
         server.Device = null;
         xbox.Release();
 
+        cfg.DsxPort = 6971;
+        var dsxTriggers = new TriggerManager(cfg, () => mock);
+        using (var dsx = new DsxServer(cfg, dsxTriggers, () => mock, () => new ControllerStatus(false, 75, PowerState.Discharging, false, false, false, 0), () => { }, writePortFile: false))
+        using (var udp = new UdpClient())
+        {
+            dsx.Apply();
+            udp.Client.ReceiveTimeout = 1000;
+            var ep = new System.Net.IPEndPoint(System.Net.IPAddress.Loopback, cfg.DsxPort);
+            string Send(string json)
+            {
+                while (mock.States.TryDequeue(out _)) { }
+                var bytes = System.Text.Encoding.ASCII.GetBytes(json);
+                udp.Send(bytes, bytes.Length, ep);
+                var from = new System.Net.IPEndPoint(System.Net.IPAddress.Any, 0);
+                try { return System.Text.Encoding.ASCII.GetString(udp.Receive(ref from)); }
+                catch (SocketException) { return ""; }
+            }
+            byte[]? Trigger(int side, byte report) => mock.States.Where(r => r[0] == report).Select(r => new StateData(r.AsSpan(report == 0x31 ? 3 : 4)))
+                .Where(s => s.AllowTrigger(side)).Select(s => s.GetTrigger(side)).LastOrDefault();
+
+            string reply = Send("{\"instructions\":[{\"type\":1,\"parameters\":[0,2,13,2,6]}]}");
+            Check(reply.Contains("\"BatteryLevel\":75") && reply.Contains("\"isControllerConnected\":true"), "DSX: server replies with battery and connection");
+            Check(Trigger(1, 0x31) is [0x21, ..] && dsxTriggers.ModActive, "DSX: Resistance on R2");
+            Send("{\"instructions\":[{\"type\":1,\"parameters\":[0,1,14,1,6,3,7]}]}");
+            Check(Trigger(0, 0x31) is [0x22, ..], "DSX: Bow on L2");
+            Send("{\"instructions\":[{\"type\":\"TriggerUpdate\",\"parameters\":[0,\"Right\",\"Machine\",1,8,3,5,20,1]}]}");
+            var machine = Trigger(1, 0x31);
+            Check(machine is [0x27, 0x02, 0x01, 43, 20, 1, ..], $"DSX: Machine on R2 by enum name ({(machine == null ? "none" : Convert.ToHexString(machine))})");
+            Send("{\"instructions\":[{\"type\":1,\"parameters\":[0,1,12,8,0,101,255,255,0,0,0]}]}");
+            Check(Trigger(0, 0x31) is [0x26, 0, 101, 255, 255, ..], "DSX: CustomTriggerValue PulseAB passes raw bytes");
+            Send("{\"instructions\":[{\"type\":2,\"parameters\":[0,10,20,30]},{\"type\":6,\"parameters\":[0,2]}]}");
+            var leds = mock.States.Where(r => r[0] == 0x32).Select(r => new StateData(r.AsSpan(4))).ToList();
+            Check(leds.Any(s => s.AllowLedColor && s.LedRed == 10 && s.LedGreen == 20 && s.LedBlue == 30), "DSX: RGBUpdate sets the lightbar");
+            Check(leds.Any(s => s.AllowPlayerIndicators && s.PlayerLights == 0x15), "DSX: PlayerLEDNewRevision -> player 3 pattern");
+            Send("{\"instructions\":[{\"type\":7,\"parameters\":[0]}]}");
+            Check(!dsxTriggers.ModActive && Trigger(0, 0x31) is [0x05, ..] && Trigger(1, 0x31) is [0x05, ..], "DSX: ResetToUserSettings turns mod effects off");
+            Send("not json");
+            Check(Send("{\"instructions\":[]}") != "", "DSX: survives a malformed packet");
+        }
+
         lock (mock.Audio) mock.Audio.Clear();
         using (var mixer = new HapticsMixer(cfg, () => mock, audio))
         using (var engine = new RumbleEngine(cfg, () => mock, mixer))

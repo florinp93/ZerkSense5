@@ -78,7 +78,7 @@ sealed class App : Application
         if (!_startHidden) ShowWindow();
         if (_demo)
         {
-            _service.EnterDemo(Demo.Controller);
+            _service.EnterDemo(Demo.Controller, Demo.Input);
             _games.StartDemo(Demo.Running);
         }
         else if (!_service.Config.SkipSetupPrompt && SetupWindow.AnyMissing(_service.Config))

@@ -108,3 +108,33 @@ Opus open-source contributors. The source code for these libraries is freely ava
 at https://gitlab.xiph.org/xiph/opus/-/tags/v1.5.2, and all binaries are being
 redistributed to you under the same terms of the general Opus license dictated above.
 ```
+
+## dualsense-tester
+
+The controller outline on the Home page is drawn from the DualSense artwork in dualsense-tester (the PlayStation logo is left out).
+
+https://github.com/daidr/dualsense-tester
+
+```
+MIT License
+
+Copyright (c) 2023 Xuezhou Dai (daidr)
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+```

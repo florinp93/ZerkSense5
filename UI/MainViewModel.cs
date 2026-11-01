@@ -74,7 +74,8 @@ sealed partial class MainViewModel : INotifyPropertyChanged
                      nameof(StatusBrush), nameof(BatteryPercent), nameof(BatteryText), nameof(PowerText),
                      nameof(IsCharging), nameof(VirtualText), nameof(VirtualBrush), nameof(HidHideText),
                      nameof(HidHideBrush), nameof(HeadsetText), nameof(RateText), nameof(StreamsText),
-                     nameof(ShowUsbipMissing), nameof(ShowHidHideMissing), nameof(MicMutedText), nameof(DriversText),
+                     nameof(ShowUsbipMissing), nameof(ShowHidHideMissing), nameof(MicMutedText), nameof(DriversText), nameof(DsxText), nameof(DsxState),
+                     nameof(MicMuted), nameof(ModeText), nameof(TriggerLText), nameof(TriggerRText),
                  })
             Notify(p);
     }
@@ -238,6 +239,29 @@ sealed partial class MainViewModel : INotifyPropertyChanged
 
     public ICommand TestRumble => _testRumble ??= new Relay(_ => _service.TestRumble());
     ICommand? _testRumble;
+
+    public Func<byte[]?> LiveInput => () => _service.LastInput;
+    public bool MicMuted => _service.Controller?.MicMuted ?? false;
+    public string ModeText => _service.State != BridgeState.Attached ? "Not plugged in"
+        : _service.ActiveMode == Games.ControllerMode.Xbox360 ? "Xbox 360" : "Wired DualSense";
+    public string TriggerLText => TriggerText(0);
+    public string TriggerRText => TriggerText(1);
+    string TriggerText(int side) => _service.Triggers.Effective(side)?.Summary is { Length: > 0 } t
+        ? (_service.Triggers.ModActive ? "DSX mod · " : "") + t
+        : "Game controlled";
+
+    public bool DsxMods
+    {
+        get => _cfg.DsxMods;
+        set { _cfg.DsxMods = value; Saved(); _service.Dsx.Apply(); Notify(nameof(DsxText)); Notify(nameof(DsxState)); }
+    }
+
+    public string DsxState => !_cfg.DsxMods ? "Off" : _service.Dsx.PortBusy ? "Port busy" : _service.Dsx.ModActive ? "Active" : "Listening";
+
+    public string DsxText => !_cfg.DsxMods ? "Off"
+        : _service.Dsx.PortBusy ? $"Port {_cfg.DsxPort} is in use. Close DSX and toggle this again."
+        : _service.Dsx.ModActive ? "A DSX mod is controlling the triggers"
+        : $"Waiting for a mod on port {_cfg.DsxPort}";
 
     public bool UseHidHide
     {

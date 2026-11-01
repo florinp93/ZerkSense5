@@ -141,6 +141,7 @@ sealed class GameManager : IDisposable
         if (Current?.Game.Key != game.Key) return;
         Log.Info($"Game closed: {game.Name}");
         Current = null;
+        _bridge.Dsx.Reset();
         Apply(null);
         _bridge.SetMode(ControllerMode.DualSense);
         UpdateAudioHaptics();

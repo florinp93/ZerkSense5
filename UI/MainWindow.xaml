@@ -69,7 +69,7 @@
                     <ColumnDefinition Width="28" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Border Width="18" Height="18" CornerRadius="9" Background="{Binding Brush}" HorizontalAlignment="Left" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="9" FontWeight="Bold" Foreground="#111419"
+                    <TextBlock Text="{Binding Glyph}" FontFamily="{StaticResource IconFont}" FontSize="9" FontWeight="Bold" Foreground="#14110F"
                                HorizontalAlignment="Center" VerticalAlignment="Center" />
                 </Border>
                 <TextBlock Grid.Column="1" Text="{Binding Name}" FontSize="13" VerticalAlignment="Center" />
@@ -99,8 +99,8 @@
                                         <Border Height="{Binding}" VerticalAlignment="Bottom" Margin="2,0" CornerRadius="3">
                                             <Border.Background>
                                                 <LinearGradientBrush StartPoint="0,1" EndPoint="0,0">
-                                                    <GradientStop Color="#2563EB" Offset="0" />
-                                                    <GradientStop Color="#60A5FA" Offset="1" />
+                                                    <GradientStop Color="#D9441A" Offset="0" />
+                                                    <GradientStop Color="#FF9466" Offset="1" />
                                                 </LinearGradientBrush>
                                             </Border.Background>
                                         </Border>
@@ -108,8 +108,8 @@
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
                             <Grid Margin="0,4,0,0">
-                                <TextBlock Text="released" FontSize="10" Foreground="#6B7385" />
-                                <TextBlock Text="fully pulled" FontSize="10" Foreground="#6B7385" HorizontalAlignment="Right" />
+                                <TextBlock Text="released" FontSize="10" Foreground="#6E655D" />
+                                <TextBlock Text="fully pulled" FontSize="10" Foreground="#6E655D" HorizontalAlignment="Right" />
                             </Grid>
                         </StackPanel>
                     </Border>
@@ -160,113 +160,67 @@
         </DataTemplate>
     </Window.Resources>
 
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="232" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-
-        <Border Background="{StaticResource Sidebar}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,1,0">
-            <DockPanel>
-                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="22,24,0,26">
-                    <Border Width="34" Height="34" CornerRadius="9">
-                        <Border.Background>
-                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                                <GradientStop Color="#60A5FA" Offset="0" />
-                                <GradientStop Color="#2563EB" Offset="1" />
-                            </LinearGradientBrush>
-                        </Border.Background>
-                        <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="White"
-                                   HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <DockPanel>
+        <Border DockPanel.Dock="Top" Background="{StaticResource Sidebar}" BorderBrush="{StaticResource Line}" BorderThickness="0,0,0,1" Height="56">
+            <Grid Margin="28,0,24,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="ZERK" FontFamily="{StaticResource DisplayFont}" FontWeight="Bold" FontSize="19" />
+                    <Border Width="4" Height="16" Background="{StaticResource Accent}" Margin="6,0" VerticalAlignment="Center">
+                        <Border.RenderTransform><SkewTransform AngleX="-18" /></Border.RenderTransform>
                     </Border>
-                    <StackPanel Margin="12,0,0,0" VerticalAlignment="Center">
-                        <TextBlock Text="ZERK SENSE" FontFamily="{StaticResource DisplayFont}" FontWeight="Bold" FontSize="15" />
-                        <TextBlock Text="DualSense bridge" FontSize="11" Foreground="{StaticResource Subtext}" />
-                    </StackPanel>
+                    <TextBlock Text="SENSE" FontFamily="{StaticResource DisplayFont}" FontWeight="Light" FontSize="19" />
+                    <TextBlock Text="5" FontFamily="{StaticResource DisplayFont}" FontWeight="Bold" FontSize="12" Foreground="{StaticResource Accent}" Margin="3,0,0,8" VerticalAlignment="Center" />
                 </StackPanel>
 
-                <Border DockPanel.Dock="Bottom" Margin="14,0,14,16" Padding="14,12" CornerRadius="8" Background="#0AFFFFFF">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <ui:BatteryGauge Width="34" Height="16" Percent="{Binding BatteryPercent}"
-                                             Charging="{Binding IsCharging}" Connected="{Binding IsConnected}" />
-                            <TextBlock Text="{Binding BatteryText}" FontWeight="SemiBold" Margin="10,0,0,0" VerticalAlignment="Center" />
-                        </StackPanel>
-                        <TextBlock Text="{Binding ControllerName}" FontSize="12" Foreground="{StaticResource Subtext}" Margin="0,6,0,0" />
-                        <TextBlock Text="{Binding VersionText}" FontSize="11" Foreground="#5A6273" Margin="0,8,0,0" />
-                    </StackPanel>
-                </Border>
-
-                <StackPanel>
-                    <RadioButton x:Name="NavOverview" Style="{StaticResource NavButton}" Tag="&#xE80F;" Content="Overview" IsChecked="True" />
-                    <RadioButton x:Name="NavGames" Style="{StaticResource NavButton}" Tag="&#xE7FC;" Content="Games" />
-                    <RadioButton x:Name="NavAudio" Style="{StaticResource NavButton}" Tag="&#xE995;" Content="Audio &amp; haptics" />
-                    <RadioButton x:Name="NavTriggers" Style="{StaticResource NavButton}" Tag="&#xE945;" Content="Triggers" />
-                    <RadioButton x:Name="NavLighting" Style="{StaticResource NavButton}" Tag="&#xE781;" Content="Lighting" />
-                    <RadioButton x:Name="NavSettings" Style="{StaticResource NavButton}" Tag="&#xE713;" Content="Settings" />
-                    <RadioButton x:Name="NavLog" Style="{StaticResource NavButton}" Tag="&#xE9D9;" Content="Activity log" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="48,0,0,0">
+                    <RadioButton x:Name="NavOverview" GroupName="nav" Style="{StaticResource NavButton}" Content="Home" IsChecked="True" />
+                    <RadioButton x:Name="NavGames" GroupName="nav" Style="{StaticResource NavButton}" Content="Games" />
+                    <RadioButton x:Name="NavAudio" GroupName="nav" Style="{StaticResource NavButton}" Content="Haptics" />
+                    <RadioButton x:Name="NavTriggers" GroupName="nav" Style="{StaticResource NavButton}" Content="Triggers" />
+                    <RadioButton x:Name="NavLighting" GroupName="nav" Style="{StaticResource NavButton}" Content="Lighting" />
                 </StackPanel>
-            </DockPanel>
+
+                <StackPanel Grid.Column="2" Orientation="Horizontal">
+                    <RadioButton x:Name="NavLog" GroupName="nav" Style="{StaticResource NavIcon}" Content="&#xE9D9;" ToolTip="Activity log" />
+                    <RadioButton x:Name="NavSettings" GroupName="nav" Style="{StaticResource NavIcon}" Content="&#xE713;" ToolTip="Settings" />
+                    <Border Width="1" Height="22" Background="{StaticResource Line}" Margin="4,0,18,0" VerticalAlignment="Center" />
+                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center" ToolTip="{Binding ControllerName}">
+                        <ui:BatteryGauge Width="28" Height="14" Percent="{Binding BatteryPercent}"
+                                         Charging="{Binding IsCharging}" Connected="{Binding IsConnected}" />
+                        <TextBlock Text="{Binding BatteryText}" FontFamily="{StaticResource DisplayFont}" FontWeight="SemiBold" Margin="8,0,0,0" VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
+            </Grid>
         </Border>
 
-        <DockPanel Grid.Column="1">
-            <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
-                    Margin="36,20,36,0" MaxWidth="900" Visibility="{Binding UpdateAvailable, Converter={StaticResource Visible}}">
-                <Grid>
-                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="{Binding UpdateTitle}" Style="{StaticResource CardTitle}" />
-                        <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
-                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                            <Button Content="Release notes" Style="{StaticResource LinkButton}" Command="{Binding OpenReleaseNotes}" Margin="0,0,16,0" />
-                            <Button Content="Skip this version" Style="{StaticResource LinkButton}" Command="{Binding SkipUpdate}" Foreground="{StaticResource Subtext}" />
-                        </StackPanel>
+        <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" BorderBrush="#55FF5F2E" Background="{StaticResource AccentSoft}"
+                Margin="36,20,36,0" MaxWidth="960" Visibility="{Binding UpdateAvailable, Converter={StaticResource Visible}}">
+            <Grid>
+                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
+                <StackPanel Grid.Column="1">
+                    <TextBlock Text="{Binding UpdateTitle}" Style="{StaticResource CardTitle}" />
+                    <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                    <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                        <Button Content="Release notes" Style="{StaticResource LinkButton}" Command="{Binding OpenReleaseNotes}" Margin="0,0,16,0" />
+                        <Button Content="Skip this version" Style="{StaticResource LinkButton}" Command="{Binding SkipUpdate}" Foreground="{StaticResource Subtext}" />
                     </StackPanel>
-                    <Button Grid.Column="2" Content="{Binding InstallUpdateText}" Style="{StaticResource AccentButton}" Command="{Binding InstallUpdate}"
-                            IsEnabled="{Binding CanInstallUpdate}" VerticalAlignment="Center" Margin="16,0,0,0" />
-                </Grid>
-            </Border>
+                </StackPanel>
+                <Button Grid.Column="2" Content="{Binding InstallUpdateText}" Style="{StaticResource AccentButton}" Command="{Binding InstallUpdate}"
+                        IsEnabled="{Binding CanInstallUpdate}" VerticalAlignment="Center" Margin="16,0,0,0" />
+            </Grid>
+        </Border>
             <Grid>
 
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavOverview, Converter={StaticResource Visible}}">
-                    <StackPanel Margin="36,30,36,24" MaxWidth="900">
-                        <TextBlock Text="Overview" Style="{StaticResource PageTitle}" />
-                        <TextBlock Text="Your DualSense over Bluetooth, presented to Windows as a wired controller." Style="{StaticResource PageSubtitle}" />
-
-
-                        <Border Style="{StaticResource CardBorder}" Background="{StaticResource HeroGradient}" Padding="28,24">
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="{Binding ControllerName}" FontFamily="{StaticResource DisplayFont}" FontSize="30" FontWeight="SemiBold" />
-                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                        <Ellipse Width="9" Height="9" Fill="{Binding StatusBrush}" VerticalAlignment="Center" />
-                                        <TextBlock Text="{Binding StatusTitle}" FontWeight="SemiBold" Margin="9,0,0,0" />
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding StatusDetail}" Style="{StaticResource Hint}" FontSize="13" Margin="0,6,0,0" MaxWidth="460" HorizontalAlignment="Left" />
-                                </StackPanel>
-                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="24,0,0,0">
-                                    <ui:BatteryGauge Width="132" Height="58" Percent="{Binding BatteryPercent}"
-                                                     Charging="{Binding IsCharging}" Connected="{Binding IsConnected}" />
-                                    <TextBlock Text="{Binding BatteryText}" FontFamily="{StaticResource DisplayFont}" FontSize="28" FontWeight="SemiBold"
-                                               HorizontalAlignment="Center" Margin="0,10,0,0" />
-                                    <TextBlock Text="{Binding PowerText}" Foreground="{StaticResource Subtext}" FontSize="12" HorizontalAlignment="Center" />
-                                </StackPanel>
-                            </Grid>
-                        </Border>
-
-                        <Border Style="{StaticResource CardBorder}" Background="{StaticResource WarningSoft}" BorderBrush="#55FBBF24"
+                    <StackPanel Margin="36,24,36,24" MaxWidth="960">
+                        <Border Style="{StaticResource CardBorder}" Background="{StaticResource WarningSoft}" BorderBrush="#55F4BE4F"
                                 Visibility="{Binding ShowUsbipMissing, Converter={StaticResource Visible}}">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                 <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource Warning}" VerticalAlignment="Top" Margin="0,2,14,0" />
                                 <StackPanel Grid.Column="1">
                                     <TextBlock Text="usbip-win2 is not installed" Style="{StaticResource CardTitle}" />
@@ -278,11 +232,7 @@
                         </Border>
                         <Border Style="{StaticResource CardBorder}" Visibility="{Binding ShowHidHideMissing, Converter={StaticResource Visible}}">
                             <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                    <ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                 <TextBlock Text="&#xE946;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
                                 <StackPanel Grid.Column="1">
                                     <TextBlock Text="Recommended: HidHide" Style="{StaticResource CardTitle}" />
@@ -293,40 +243,81 @@
                             </Grid>
                         </Border>
 
-                        <UniformGrid Columns="3" Margin="-6,0">
-                            <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
+                        <Grid Background="{StaticResource StageGlow}">
+                            <Grid.RowDefinitions><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /><RowDefinition Height="Auto" /></Grid.RowDefinitions>
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                 <StackPanel>
-                                    <TextBlock Text="&#xE702;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{StaticResource AccentLight}" />
-                                    <TextBlock Text="Bluetooth link" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
-                                    <TextBlock Text="{Binding RateText}" FontSize="18" FontWeight="SemiBold" />
-                                    <TextBlock Text="input report rate" Style="{StaticResource Hint}" />
+                                    <TextBlock Text="CONTROLLER" Style="{StaticResource Eyebrow}" />
+                                    <TextBlock Text="{Binding ControllerName}" FontFamily="{StaticResource DisplayFont}" FontStretch="SemiCondensed" FontSize="36" FontWeight="SemiBold" Margin="0,2,0,0" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                                        <Rectangle Width="8" Height="8" Fill="{Binding StatusBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding StatusTitle}" FontFamily="{StaticResource DisplayFont}" FontSize="15" Margin="9,0,0,0" />
+                                    </StackPanel>
                                 </StackPanel>
-                            </Border>
-                            <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
-                                <StackPanel>
-                                    <TextBlock Text="&#xE88E;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{Binding VirtualBrush}" />
-                                    <TextBlock Text="Wired mode" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
-                                    <TextBlock Text="{Binding VirtualText}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                <StackPanel Grid.Column="1" HorizontalAlignment="Right" VerticalAlignment="Bottom">
+                                    <TextBlock Text="BATTERY" Style="{StaticResource Eyebrow}" HorizontalAlignment="Right" />
+                                    <TextBlock Text="{Binding BatteryText}" FontFamily="{StaticResource DisplayFont}" FontSize="44" FontWeight="SemiBold" HorizontalAlignment="Right" Margin="0,-4,0,-4" />
+                                    <TextBlock Text="{Binding PowerText}" Style="{StaticResource Hint}" HorizontalAlignment="Right" />
                                 </StackPanel>
-                            </Border>
-                            <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
-                                <StackPanel>
-                                    <TextBlock Text="&#xE767;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{StaticResource AccentLight}" />
-                                    <TextBlock Text="Audio" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
-                                    <TextBlock Text="{Binding StreamsText}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+                            </Grid>
+
+                            <Grid Grid.Row="1" Margin="0,18,0,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="170" /><ColumnDefinition Width="*" /><ColumnDefinition Width="170" /></Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Top" Margin="0,8,0,0">
+                                    <TextBlock Text="L2 EFFECT" Style="{StaticResource Eyebrow}" />
+                                    <TextBlock Text="{Binding TriggerLText}" Style="{StaticResource Hint}" Foreground="{StaticResource Text}" FontSize="13" />
                                 </StackPanel>
-                            </Border>
-                        </UniformGrid>
+                                <ui:ControllerView Grid.Column="1" Height="330" Input="{Binding LiveInput}" Lightbar="{Binding LightbarBrush}"
+                                                   Connected="{Binding IsConnected}" MicMuted="{Binding MicMuted}" />
+                                <StackPanel Grid.Column="2" VerticalAlignment="Top" Margin="0,8,0,0">
+                                    <TextBlock Text="R2 EFFECT" Style="{StaticResource Eyebrow}" HorizontalAlignment="Right" />
+                                    <TextBlock Text="{Binding TriggerRText}" Style="{StaticResource Hint}" Foreground="{StaticResource Text}" FontSize="13" TextAlignment="Right" />
+                                </StackPanel>
+                            </Grid>
+                            <TextBlock Grid.Row="2" Text="{Binding StatusDetail}" Style="{StaticResource Hint}" FontSize="13" HorizontalAlignment="Center" TextAlignment="Center" MaxWidth="520" Margin="0,10,0,0" />
+                        </Grid>
+
+                        <Border BorderBrush="{StaticResource Line}" BorderThickness="0,1" Margin="0,22,0,14" Padding="0,14">
+                            <UniformGrid Columns="4">
+                                <StackPanel Margin="0,0,16,0">
+                                    <TextBlock Text="BLUETOOTH LINK" Style="{StaticResource Eyebrow}" />
+                                    <TextBlock Text="{Binding RateText}" Style="{StaticResource Readout}" />
+                                    <TextBlock Text="input reports per second" Style="{StaticResource Hint}" />
+                                </StackPanel>
+                                <Border BorderBrush="{StaticResource Line}" BorderThickness="1,0,0,0" Padding="16,0">
+                                    <StackPanel>
+                                        <TextBlock Text="WINDOWS SEES" Style="{StaticResource Eyebrow}" />
+                                        <TextBlock Text="{Binding ModeText}" Style="{StaticResource Readout}" Foreground="{Binding VirtualBrush}" />
+                                        <TextBlock Text="virtual USB controller" Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderBrush="{StaticResource Line}" BorderThickness="1,0,0,0" Padding="16,0">
+                                    <StackPanel>
+                                        <TextBlock Text="AUDIO" Style="{StaticResource Eyebrow}" />
+                                        <TextBlock Text="{Binding StreamsText}" Style="{StaticResource Readout}" FontSize="15" TextWrapping="Wrap" TextTrimming="None" />
+                                    </StackPanel>
+                                </Border>
+                                <Border BorderBrush="{StaticResource Line}" BorderThickness="1,0,0,0" Padding="16,0,0,0">
+                                    <StackPanel>
+                                        <TextBlock Text="DSX MODS" Style="{StaticResource Eyebrow}" />
+                                        <TextBlock Text="{Binding DsxState}" Style="{StaticResource Readout}" />
+                                        <TextBlock Text="{Binding DsxText}" Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                </Border>
+                            </UniformGrid>
+                        </Border>
 
                         <WrapPanel>
                             <Border Style="{StaticResource Pill}"><TextBlock Text="{Binding HeadsetText}" FontSize="12" /></Border>
                             <Border Style="{StaticResource Pill}"><TextBlock Text="{Binding MicMutedText}" FontSize="12" /></Border>
                             <Border Style="{StaticResource Pill}">
                                 <StackPanel Orientation="Horizontal">
-                                    <Ellipse Width="7" Height="7" Fill="{Binding HidHideBrush}" VerticalAlignment="Center" Margin="0,0,7,0" />
+                                    <Rectangle Width="7" Height="7" Fill="{Binding HidHideBrush}" VerticalAlignment="Center" Margin="0,0,7,0" />
                                     <TextBlock Text="{Binding HidHideText}" FontSize="12" />
                                 </StackPanel>
                             </Border>
+                            <Border Style="{StaticResource Pill}"><TextBlock Text="{Binding VersionText}" FontSize="12" Foreground="{StaticResource Faint}" /></Border>
                         </WrapPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -385,7 +376,7 @@
                                     </Grid>
                                     <Grid Margin="6,0,6,8">
                                         <TextBox Text="{Binding GameFilter, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
-                                        <TextBlock Text="Search games" Foreground="#6B7385" FontSize="13" Margin="10,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
+                                        <TextBlock Text="Search games" Foreground="#6E655D" FontSize="13" Margin="10,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
                                                    Visibility="{Binding FilterEmpty, Converter={StaticResource Visible}}" />
                                     </Grid>
                                     <Grid Margin="10,0,6,10">
@@ -484,7 +475,7 @@
                                     </StackPanel>
                                 </Border>
 
-                                <Border Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
+                                <Border Style="{StaticResource CardBorder}" BorderBrush="#55FF5F2E" Background="{StaticResource AccentSoft}"
                                         Visibility="{Binding HasPromptMod, Converter={StaticResource Visible}}">
                                     <StackPanel>
                                         <StackPanel Orientation="Horizontal">
@@ -954,6 +945,16 @@
                                         </StackPanel>
                                     </Border>
                                 </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="DSX mods" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Game mods made for DSX can drive the triggers and lights. DSX itself isn't needed." Style="{StaticResource Hint}" />
+                                        <TextBlock Text="{Binding DsxText}" Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding DsxMods}" />
+                                </Grid>
                             </StackPanel>
                         </Border>
                     </StackPanel>
@@ -1221,7 +1222,7 @@
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal" Margin="0,2">
-                                            <TextBlock Text="{Binding Time}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="#5A6273" Width="70" />
+                                            <TextBlock Text="{Binding Time}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="#6E655D" Width="70" />
                                             <TextBlock Text="{Binding Tag}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="{Binding TagBrush}" Width="44" />
                                             <TextBlock Text="{Binding Message}" FontFamily="Cascadia Mono, Consolas" FontSize="12" TextWrapping="Wrap" />
                                         </StackPanel>
@@ -1232,6 +1233,5 @@
                     </Border>
                 </DockPanel>
             </Grid>
-        </DockPanel>
-    </Grid>
+    </DockPanel>
 </Window>

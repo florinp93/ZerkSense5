@@ -67,28 +67,37 @@ sealed class BridgeService : IDisposable
         Triggers = new TriggerManager(config, () => _bt);
         _rumble.Changed += Triggers.OnRumble;
         _lighting = new LightingEngine(config, () => _bt, () => Controller, () => AudioHaptics.Level);
+        Dsx = new DsxServer(config, Triggers, () => _bt, () => Controller, _lighting.NoteGameLightbar);
         _thread = new Thread(Run) { IsBackground = true, Name = "Bridge" };
     }
 
     public event Action? Changed;
+    public event Action<byte[], int>? RawInput;
 
     public Config Config { get; }
     public AudioHaptics AudioHaptics { get; }
     public TriggerManager Triggers { get; }
+    public DsxServer Dsx { get; }
     public BridgeState State { get; private set; } = BridgeState.Starting;
     public ControllerMode ActiveMode { get; private set; } = ControllerMode.DualSense;
     public ControllerStatus? Controller { get; private set; }
+    public byte[]? LastInput { get; private set; }
     public bool UsbipInstalled { get; private set; }
     public bool HidHideInstalled { get; private set; }
     public bool ControllerHidden { get; private set; }
     public bool SpeakerStreamOpen => _device?.SpeakerStreamOpen ?? false;
     public bool MicStreamOpen => _device?.MicStreamOpen ?? false;
 
-    public void Start() => _thread.Start();
+    public void Start()
+    {
+        _thread.Start();
+        Dsx.Apply();
+    }
 
-    public void EnterDemo(ControllerStatus controller)
+    public void EnterDemo(ControllerStatus controller, byte[] input)
     {
         Controller = controller;
+        LastInput = input;
         State = BridgeState.Attached;
         UsbipInstalled = HidHideInstalled = ControllerHidden = true;
         Raise();
@@ -291,6 +300,7 @@ sealed class BridgeService : IDisposable
         _audio.MicActive = false;
         _audio.ResetMic();
         Controller = null;
+        LastInput = null;
         State = BridgeState.WaitingForController;
         if (!_quit.IsSet) Log.Info("Controller disconnected");
         Raise();
@@ -350,8 +360,10 @@ sealed class BridgeService : IDisposable
     void OnInput(byte[] buf, int len)
     {
         Interlocked.Exchange(ref _lastReport, Environment.TickCount64);
+        RawInput?.Invoke(buf, len);
         if (len < 2 + 63 || buf[0] != 0x31 || (buf[1] & 0x02) != 0) return;
         Interlocked.Increment(ref _reports);
+        LastInput = buf.AsSpan(2, 63).ToArray();
         if (Controller is not { } c) return;
 
         byte power = buf[2 + 52], plugged = buf[2 + 53];
@@ -389,6 +401,7 @@ sealed class BridgeService : IDisposable
     {
         _quit.Set();
         if (_thread.IsAlive) _thread.Join(3000);
+        Dsx.Dispose();
         _rumble.Dispose();
         _lighting.Dispose();
         lock (_captureLock) _capture?.Dispose();

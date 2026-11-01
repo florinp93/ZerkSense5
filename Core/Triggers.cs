@@ -90,7 +90,7 @@ sealed class TriggerEffect
         return c;
     }
 
-    static byte[] Zones(byte mode, int[] strengths)
+    public static byte[] Zones(byte mode, int[] strengths)
     {
         int active = 0;
         uint values = 0;
@@ -158,6 +158,7 @@ sealed class TriggerManager
     readonly Config _cfg;
     readonly Func<IController?> _bt;
     readonly byte[][] _captured = new byte[2][];
+    readonly TriggerEffect?[] _mod = new TriggerEffect?[2];
     bool[] _customApplied = new bool[2];
     int _kickLevel;
     long _lastKick;
@@ -172,7 +173,25 @@ sealed class TriggerManager
 
     public byte[]? LastCaptured(int side) => _captured[side];
 
-    public TriggerEffect? Effective(int side) => side == 0 ? _cfg.Now.TriggerL : _cfg.Now.TriggerR;
+    public TriggerEffect? Effective(int side) => _mod[side] ?? (side == 0 ? _cfg.Now.TriggerL : _cfg.Now.TriggerR);
+
+    public bool ModActive => _mod[0] != null || _mod[1] != null;
+
+    public void SetMod(int side, TriggerEffect effect)
+    {
+        _mod[side] = effect;
+        var s = new StateData();
+        s.SetTrigger(side, effect.Encode());
+        _customApplied[side] = true;
+        _bt()?.SendState(s.ToReport31());
+    }
+
+    public void ClearMods()
+    {
+        if (!ModActive) return;
+        _mod[0] = _mod[1] = null;
+        Apply();
+    }
 
     public void Apply()
     {
@@ -223,7 +242,7 @@ sealed class TriggerManager
         var s = new StateData();
         for (int side = 0; side < 2; side++)
         {
-            if (_cfg.TriggerKick == 2 && side == 0) continue;
+            if (_cfg.TriggerKick == 2 && side == 0 || _mod[side] != null) continue;
             if (Effective(side) is { } custom && level == 0)
             {
                 s.SetTrigger(side, custom.Encode());

@@ -26,6 +26,21 @@ static class Demo
 
     public static ControllerStatus Controller => new(false, 85, PowerState.Charging, false, false, false, 612);
 
+    public static byte[] Input
+    {
+        get
+        {
+            var s = new byte[63];
+            s[0] = 196; s[1] = 92; s[2] = 128; s[3] = 128;
+            s[5] = 178;
+            s[7] = 0x08 | 0x20;
+            s[8] = 0x02;
+            s[32] = 0x01; s[33] = 0x40; s[34] = 0x46; s[35] = 0x19;
+            s[36] = 0x80;
+            return s;
+        }
+    }
+
     public static Config CreateConfig()
     {
         string path = Path.Combine(Path.GetTempPath(), "ZerkSense5", "demo-config.json");

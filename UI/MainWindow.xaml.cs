@@ -25,7 +25,7 @@ partial class MainWindow : Window
         var hwnd = new WindowInteropHelper(window).Handle;
         int dark = 1;
         DwmSetWindowAttribute(hwnd, 20, ref dark, sizeof(int));
-        int caption = 0x1B1512;
+        int caption = 0x0E1012;
         DwmSetWindowAttribute(hwnd, 35, ref caption, sizeof(int));
     }
 }

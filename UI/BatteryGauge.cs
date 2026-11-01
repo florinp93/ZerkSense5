@@ -18,7 +18,7 @@ sealed class BatteryGauge : FrameworkElement
     public bool Connected { get => (bool)GetValue(ConnectedProperty); set => SetValue(ConnectedProperty, value); }
 
     public static Color LevelColor(int percent, bool charging) =>
-        charging ? Color.FromRgb(0x60, 0xA5, 0xFA)
+        charging ? Color.FromRgb(0xFF, 0x94, 0x66)
         : percent <= 15 ? Color.FromRgb(0xF8, 0x71, 0x71)
         : percent <= 35 ? Color.FromRgb(0xFB, 0xBF, 0x24)
         : Color.FromRgb(0x34, 0xD3, 0x99);
