@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.7.0-alpha.1] - 2026-11-01
 
 ### Added
 - DSX mod support: mods written for DSX drive the adaptive triggers, lightbar, player LEDs and mic LED without DSX installed. Can be turned off on the Triggers page.
@@ -58,6 +58,7 @@ First public pre-release.
 - A DualSense Edge is presented as a regular DualSense.
 - Covers are shown for Steam games only.
 
+[0.7.0-alpha.1]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.7.0-alpha.1
 [0.6.0-alpha.3]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.3
 [0.6.0-alpha.2]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.2
 [0.6.0-alpha.1]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.1
