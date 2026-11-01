@@ -202,7 +202,11 @@ sealed class BridgeService : IDisposable
         while (!_quit.IsSet)
         {
             UsbipInstalled = Usbip.Locate(Config) != null;
-            _hidHide ??= HidHide.Locate();
+            if (_hidHide == null)
+            {
+                _hidHide = HidHide.Locate();
+                _hidHide?.AllowSelf();
+            }
             HidHideInstalled = _hidHide != null;
 
             var info = DualSenseBt.Find();

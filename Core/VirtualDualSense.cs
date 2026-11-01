@@ -17,7 +17,7 @@ sealed class VirtualDualSense : IUsbDevice
     readonly byte[] _mute = new byte[2];
     readonly short[] _volume = [0, 48 * 256];
     byte[] _lastInput = new byte[64];
-    bool _headphones, _micMuted;
+    bool _headphones, _micMuted, _mutePressed;
 
     public VirtualDualSense(IController bt, AudioBridge audio, Config cfg, Action<StateData>? onGameReport = null)
     {
@@ -76,13 +76,14 @@ sealed class VirtualDualSense : IUsbDevice
             _headphones = headphones;
             _audio.HeadsetPlugged = headphones;
         }
-        bool micMuted = (status & 4) != 0;
-        if (micMuted != _micMuted)
+        bool mutePressed = (buf[2 + 9] & 0x04) != 0;
+        if (mutePressed && !_mutePressed)
         {
-            _micMuted = micMuted;
-            var s = new StateData { AllowMuteLight = true, MuteLightMode = (byte)(micMuted ? 1 : 0) };
-            _bt.SendState(s.ToReport32());
+            _micMuted = !_micMuted;
+            SendMicMute();
+            Log.Info(_micMuted ? "Microphone muted" : "Microphone unmuted");
         }
+        _mutePressed = mutePressed;
 
         var report = new byte[64];
         report[0] = 0x01;
@@ -132,7 +133,43 @@ sealed class VirtualDualSense : IUsbDevice
         if (_alt[UsbDescriptors.ItfSpeaker] != 0) _audio.ProcessUsbOut(packet);
     }
 
-    public void IsoIn(int ep, Span<byte> packet) => _audio.FillMicPacket(packet);
+    public void IsoIn(int ep, Span<byte> packet)
+    {
+        _audio.FillMicPacket(packet);
+        if (_micMuted) packet.Clear();
+    }
+
+    void SendMicMute()
+    {
+        var s = new StateData
+        {
+            AllowMuteLight = true,
+            MuteLightMode = (byte)(_micMuted ? 1 : 0),
+            AllowAudioMute = true,
+            MicMute = _micMuted || _mute[1] != 0,
+            SpeakerMute = _mute[0] != 0,
+            HeadphoneMute = _mute[0] != 0,
+        };
+        _bt.SendState(s.ToReport32());
+    }
+
+    void SendSpeakerLevel()
+    {
+        if (_cfg.LockVolume) return;
+        byte level = (byte)Math.Clamp(100f + _volume[0] / 256f, 0, 100);
+        var s = new StateData
+        {
+            AllowHeadphoneVolume = true,
+            AllowSpeakerVolume = true,
+            VolumeHeadphones = level,
+            VolumeSpeaker = level,
+            AllowAudioMute = true,
+            MicMute = _micMuted || _mute[1] != 0,
+            SpeakerMute = _mute[0] != 0,
+            HeadphoneMute = _mute[0] != 0,
+        };
+        _bt.SendState(s.ToReport32());
+    }
 
     void SetMicActive(bool active)
     {
@@ -190,7 +227,11 @@ sealed class VirtualDualSense : IUsbDevice
                 int itf = index & 0xFF, alt = value & 0xFF;
                 if (itf > 3) return -EPIPE;
                 _alt[itf] = alt;
-                if (itf == UsbDescriptors.ItfSpeaker) Log.Info($"Speaker/haptics stream {(alt != 0 ? "opened" : "closed")}");
+                if (itf == UsbDescriptors.ItfSpeaker)
+                {
+                    Log.Info($"Speaker/haptics stream {(alt != 0 ? "opened" : "closed")}");
+                    if (alt != 0) SendSpeakerLevel();
+                }
                 if (itf == UsbDescriptors.ItfMic)
                 {
                     Log.Info($"Microphone stream {(alt != 0 ? "opened" : "closed")}");
@@ -286,7 +327,7 @@ sealed class VirtualDualSense : IUsbDevice
                     var s = new StateData
                     {
                         AllowAudioMute = true,
-                        MicMute = _mute[1] != 0,
+                        MicMute = _micMuted || _mute[1] != 0,
                         SpeakerMute = _mute[0] != 0,
                         HeadphoneMute = _mute[0] != 0,
                     };

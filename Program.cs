@@ -22,9 +22,10 @@ static class Program
 
         var cfg = Config.Load(Path.Combine(AppContext.BaseDirectory, "config.json"));
 
-        if (args.Contains("--probe") || args.Contains("--selftest") || args.Contains("--games") || args.Contains("--capture") || args.Contains("--check-update"))
+        if (args.Contains("--probe") || args.Contains("--selftest") || args.Contains("--games") || args.Contains("--capture") || args.Contains("--check-update") || args.Contains("--speaker-test"))
         {
             AttachConsole(-1);
+            if (args.Contains("--speaker-test")) return Diagnostics.SpeakerTest(cfg, 5);
             if (args.Contains("--capture"))
             {
                 var pidArg = args.SkipWhile(a => a != "--capture").Skip(1).FirstOrDefault();

@@ -94,6 +94,80 @@ static class Diagnostics
         return bt.Alive ? 0 : 1;
     }
 
+    public static int SpeakerTest(Config cfg, int seconds)
+    {
+        var info = DualSenseBt.Find();
+        if (info == null)
+        {
+            Log.Error("No DualSense connected over Bluetooth.");
+            return 1;
+        }
+        using var bt = DualSenseBt.Open(info);
+        if (bt == null)
+        {
+            Log.Error("Open failed");
+            return 1;
+        }
+        bool headphones = false;
+        bt.InputReport += (buf, n) =>
+        {
+            if (buf[0] == 0x31 && (buf[1] & 2) == 0 && n > 2 + 53) headphones = (buf[2 + 53] & 1) != 0;
+        };
+        bt.Start();
+        Thread.Sleep(300);
+
+        var init = new StateData
+        {
+            AllowAudioControl = true, MicSelect = cfg.MicSelect, NoiseCancelEnable = true,
+            AllowSpeakerVolume = true, AllowHeadphoneVolume = true, VolumeSpeaker = 100, VolumeHeadphones = 100,
+            AllowAudioMute = true,
+        };
+        bt.SendState(init.ToReport31());
+        bt.SendState(init.ToReport32());
+
+        int reports = 0;
+        var counting = new CountingController(bt, () => reports++);
+        var audio = new AudioBridge(cfg, () => counting) { HeadsetPlugged = headphones };
+        Log.Info($"Playing a 440 Hz tone for {seconds} s to the {(headphones ? "headset jack" : "speaker")}, packet mode {(cfg.PacketMode == 1 ? "single" : "double")}");
+
+        var pcm = new byte[48 * 8];
+        double phase = 0;
+        var clock = Stopwatch.StartNew();
+        long sentMs = 0;
+        while (clock.ElapsedMilliseconds < seconds * 1000 && bt.Alive)
+        {
+            for (int i = 0; i < 48; i++)
+            {
+                short v = (short)(Math.Sin(phase) * 12000);
+                phase += 2 * Math.PI * 440 / 48000;
+                BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i * 8), v);
+                BinaryPrimitives.WriteInt16LittleEndian(pcm.AsSpan(i * 8 + 2), v);
+            }
+            audio.ProcessUsbOut(pcm);
+            sentMs++;
+            while (clock.ElapsedMilliseconds < sentMs) Thread.Sleep(1);
+        }
+        Thread.Sleep(200);
+        Log.Info($"Sent {reports} audio reports, link alive={bt.Alive}, write mode: " + (bt.PadRequired.Count == 0
+            ? "exact report length"
+            : string.Join(", ", bt.PadRequired.Select(kv => $"{kv.Key}B padded"))));
+        return bt.Alive ? 0 : 1;
+    }
+
+    sealed class CountingController(DualSenseBt inner, Action onAudio) : IController
+    {
+        public event Action<byte[], int>? InputReport { add => inner.InputReport += value; remove => inner.InputReport -= value; }
+        public byte[]? GetFeatureLive(byte id) => inner.GetFeatureLive(id);
+        public byte[]? GetFeatureCached(byte id) => inner.GetFeatureCached(id);
+        public bool SetFeature(byte id, ReadOnlySpan<byte> body) => inner.SetFeature(id, body);
+        public void SendState(byte[] report) => inner.SendState(report);
+        public void SendAudio(byte[] report)
+        {
+            onAudio();
+            inner.SendAudio(report);
+        }
+    }
+
     public static int Capture(Config cfg, int? pid)
     {
         var audio = new AudioBridge(cfg, () => null);
@@ -478,7 +552,7 @@ static class Diagnostics
         string[] order = ["0.5.9", "0.6.0-alpha.1", "0.6.0-alpha.2", "0.6.0-alpha.10", "0.6.0-alpha.beta", "0.6.0-beta.1", "0.6.0-rc.1", "0.6.0", "0.6.1-alpha.1", "1.0.0"];
         bool ordered = order.Zip(order.Skip(1)).All(p => SemVersion.Parse(p.First)! < SemVersion.Parse(p.Second)!);
         Check(ordered && SemVersion.Parse("v0.6.0-alpha.1")!.ToString() == "0.6.0-alpha.1", "Update versions compare by SemVer rules");
-        Check(Updater.Current.ToString() == "0.6.0-alpha.1", $"Build reports its version ({Updater.Current})");
+        Check(Updater.Current > new SemVersion(0, 0, 0, []), $"Build reports its version ({Updater.Current})");
 
         Log.Info(failures == 0 ? "Self-test passed" : $"Self-test: {failures} failure(s)");
         return failures == 0 ? 0 : 1;

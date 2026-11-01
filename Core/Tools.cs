@@ -119,10 +119,12 @@ sealed class HidHide(string cli)
         return cli == null ? null : new HidHide(cli);
     }
 
+    public void AllowSelf() => Proc.Run(cli, $"--app-reg \"{Environment.ProcessPath}\"");
+
     public void Hide(string instanceId)
     {
         if (string.IsNullOrEmpty(instanceId) || _hidden.Contains(instanceId)) return;
-        Proc.Run(cli, $"--app-reg \"{Environment.ProcessPath}\"");
+        AllowSelf();
         var (code, output) = Proc.Run(cli, $"--dev-hide \"{instanceId}\"");
         Proc.Run(cli, "--cloak-on");
         if (code == 0)

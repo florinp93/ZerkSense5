@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Concentus;
 using Concentus.Enums;
 
@@ -10,6 +11,8 @@ sealed class AudioBridge
     const int SpeakerFrames = 480;
     const int MicOpusSize = 71;
     const int MicFrames = 480;
+    const int MaxQueuedFrames = 8;
+    const double FrameMs = 32 * 1000.0 / 3000;
 
     readonly Config _cfg;
     readonly Func<IController?> _bt;
@@ -24,6 +27,8 @@ sealed class AudioBridge
     readonly float[] _speakerBuf = new float[SpeakerFrames * 2];
     int _speakerPos;
     readonly Queue<byte[]> _speakerFifo = new();
+    readonly object _fifoLock = new();
+    readonly AutoResetEvent _frameReady = new(false);
     readonly IOpusEncoder _encoder;
     readonly Action<float, float> _onSpeaker, _onHaptic;
 
@@ -50,6 +55,7 @@ sealed class AudioBridge
         _decoder = OpusCodecFactory.CreateDecoder(48000, 1);
         _onSpeaker = OnSpeakerSample;
         _onHaptic = OnHapticSample;
+        new Thread(SendLoop) { IsBackground = true, Name = "Audio sender", Priority = ThreadPriority.AboveNormal }.Start();
     }
 
     bool SpeakerEnabled => _cfg.SpeakerSelect != 3;
@@ -97,7 +103,6 @@ sealed class AudioBridge
             for (int i = 0; i < SampleSize; i++)
                 frame[i] = (byte)(sbyte)Math.Clamp((int)(_hapticNative[i] * 127f), -128, 127);
             Push(_hapticsFifo, frame);
-            SendIfReady();
         }
     }
 
@@ -107,36 +112,83 @@ sealed class AudioBridge
         int n = _encoder.Encode(_speakerBuf, SpeakerFrames, packet, packet.Length);
         if (n <= 0) return;
         Push(_speakerFifo, packet);
-        SendIfReady();
     }
 
-    static void Push(Queue<byte[]> q, byte[] item)
+    void Push(Queue<byte[]> q, byte[] item)
     {
-        if (q.Count >= 2) q.Dequeue();
-        q.Enqueue(item);
-    }
-
-    void SendIfReady()
-    {
-        int frames = _cfg.PacketMode == 1 ? 1 : 2;
-        if (_hapticsFifo.Count < frames) return;
-        if (SpeakerEnabled && _speakerFifo.Count < frames) return;
-
-        var haptics = new byte[frames * SampleSize];
-        for (int i = 0; i < frames; i++) _hapticsFifo.Dequeue().CopyTo(haptics, i * SampleSize);
-
-        byte[] report;
-        if (!SpeakerEnabled)
+        lock (_fifoLock)
         {
-            report = HapticsOnly(haptics, frames == 2);
+            if (q.Count >= MaxQueuedFrames) q.Dequeue();
+            q.Enqueue(item);
         }
-        else
+        _frameReady.Set();
+    }
+
+    int Buffered()
+    {
+        lock (_fifoLock)
+            return SpeakerEnabled ? Math.Min(_hapticsFifo.Count, _speakerFifo.Count) : _hapticsFifo.Count;
+    }
+
+    void SendLoop()
+    {
+        var clock = Stopwatch.StartNew();
+        double next = 0;
+        bool playing = false;
+        while (true)
         {
-            var speaker = new byte[frames * SpeakerOpusSize];
-            for (int i = 0; i < frames; i++) _speakerFifo.Dequeue().CopyTo(speaker, i * SpeakerOpusSize);
-            report = frames == 1 ? Single(haptics, speaker) : Double(haptics, speaker);
+            int frames = _cfg.PacketMode == 1 ? 1 : 2;
+            int target = frames * 2;
+            if (!playing)
+            {
+                if (Buffered() < target)
+                {
+                    _frameReady.WaitOne(50);
+                    continue;
+                }
+                playing = true;
+                next = clock.Elapsed.TotalMilliseconds;
+            }
+            if (!SendFrames(frames))
+            {
+                playing = false;
+                continue;
+            }
+            int left = Buffered();
+            double period = frames * FrameMs * (left > target ? 0.97 : left < frames ? 1.03 : 1.0);
+            next += period;
+            double wait = next - clock.Elapsed.TotalMilliseconds;
+            if (wait < -period * 2) next = clock.Elapsed.TotalMilliseconds;
+            else if (wait > 1.5) Thread.Sleep((int)(wait - 1));
+            while (clock.Elapsed.TotalMilliseconds < next) Thread.SpinWait(20);
+        }
+    }
+
+    bool SendFrames(int frames)
+    {
+        byte[] report;
+        lock (_fifoLock)
+        {
+            if (_hapticsFifo.Count < frames) return false;
+            if (SpeakerEnabled && _speakerFifo.Count < frames) return false;
+
+            var haptics = new byte[frames * SampleSize];
+            for (int i = 0; i < frames; i++) _hapticsFifo.Dequeue().CopyTo(haptics, i * SampleSize);
+
+            if (!SpeakerEnabled)
+            {
+                _speakerFifo.Clear();
+                report = HapticsOnly(haptics, frames == 2);
+            }
+            else
+            {
+                var speaker = new byte[frames * SpeakerOpusSize];
+                for (int i = 0; i < frames; i++) _speakerFifo.Dequeue().CopyTo(speaker, i * SpeakerOpusSize);
+                report = frames == 1 ? Single(haptics, speaker) : Double(haptics, speaker);
+            }
         }
         _bt()?.SendAudio(report);
+        return true;
     }
 
     byte SpeakerBlockId =>
