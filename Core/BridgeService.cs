@@ -388,7 +388,7 @@ sealed class BridgeService : IDisposable
     public void Dispose()
     {
         _quit.Set();
-        _thread.Join(3000);
+        if (_thread.IsAlive) _thread.Join(3000);
         _rumble.Dispose();
         _lighting.Dispose();
         lock (_captureLock) _capture?.Dispose();

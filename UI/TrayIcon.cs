@@ -31,6 +31,7 @@ sealed class TrayIcon : IDisposable
         {
             if (e.Button == Forms.MouseButtons.Left) OpenRequested?.Invoke();
         };
+        _icon.BalloonTipClicked += (_, _) => OpenRequested?.Invoke();
         Update();
     }
 

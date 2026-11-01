@@ -44,8 +44,6 @@ static class Program
         }
 
         using var service = new BridgeService(cfg);
-        var app = new App(service, startHidden: cfg.StartMinimized || args.Contains("--minimized"));
-        service.Start();
-        return app.Run();
+        return new App(service, startHidden: cfg.StartMinimized || args.Contains("--minimized")).Run();
     }
 }

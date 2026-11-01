@@ -209,1022 +209,1029 @@
             </DockPanel>
         </Border>
 
-        <Grid Grid.Column="1">
+        <DockPanel Grid.Column="1">
+            <Border DockPanel.Dock="Top" Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
+                    Margin="36,20,36,0" MaxWidth="900" Visibility="{Binding UpdateAvailable, Converter={StaticResource Visible}}">
+                <Grid>
+                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                    <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="{Binding UpdateTitle}" Style="{StaticResource CardTitle}" />
+                        <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                        <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Content="Release notes" Style="{StaticResource LinkButton}" Command="{Binding OpenReleaseNotes}" Margin="0,0,16,0" />
+                            <Button Content="Skip this version" Style="{StaticResource LinkButton}" Command="{Binding SkipUpdate}" Foreground="{StaticResource Subtext}" />
+                        </StackPanel>
+                    </StackPanel>
+                    <Button Grid.Column="2" Content="{Binding InstallUpdateText}" Style="{StaticResource AccentButton}" Command="{Binding InstallUpdate}"
+                            IsEnabled="{Binding CanInstallUpdate}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                </Grid>
+            </Border>
+            <Grid>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavOverview, Converter={StaticResource Visible}}">
-                <StackPanel Margin="36,30,36,24" MaxWidth="900">
-                    <TextBlock Text="Overview" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="Your DualSense over Bluetooth, presented to Windows as a wired controller." Style="{StaticResource PageSubtitle}" />
-                    <Border Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
-                            Visibility="{Binding UpdateAvailable, Converter={StaticResource Visible}}">
-                        <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                            <TextBlock Text="&#xE896;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="{Binding UpdateTitle}" Style="{StaticResource CardTitle}" />
-                                <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" />
-                                <StackPanel Orientation="Horizontal" Margin="0,6,0,0">
-                                    <Button Content="Release notes" Style="{StaticResource LinkButton}" Command="{Binding OpenReleaseNotes}" Margin="0,0,16,0" />
-                                    <Button Content="Skip this version" Style="{StaticResource LinkButton}" Command="{Binding SkipUpdate}" Foreground="{StaticResource Subtext}" />
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavOverview, Converter={StaticResource Visible}}">
+                    <StackPanel Margin="36,30,36,24" MaxWidth="900">
+                        <TextBlock Text="Overview" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="Your DualSense over Bluetooth, presented to Windows as a wired controller." Style="{StaticResource PageSubtitle}" />
+
+
+                        <Border Style="{StaticResource CardBorder}" Background="{StaticResource HeroGradient}" Padding="28,24">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding ControllerName}" FontFamily="{StaticResource DisplayFont}" FontSize="30" FontWeight="SemiBold" />
+                                    <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                        <Ellipse Width="9" Height="9" Fill="{Binding StatusBrush}" VerticalAlignment="Center" />
+                                        <TextBlock Text="{Binding StatusTitle}" FontWeight="SemiBold" Margin="9,0,0,0" />
+                                    </StackPanel>
+                                    <TextBlock Text="{Binding StatusDetail}" Style="{StaticResource Hint}" FontSize="13" Margin="0,6,0,0" MaxWidth="460" HorizontalAlignment="Left" />
                                 </StackPanel>
-                            </StackPanel>
-                            <Button Grid.Column="2" Content="{Binding InstallUpdateText}" Style="{StaticResource AccentButton}" Command="{Binding InstallUpdate}"
-                                    IsEnabled="{Binding CanInstallUpdate}" VerticalAlignment="Center" Margin="16,0,0,0" />
-                        </Grid>
-                    </Border>
-
-
-                    <Border Style="{StaticResource CardBorder}" Background="{StaticResource HeroGradient}" Padding="28,24">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="{Binding ControllerName}" FontFamily="{StaticResource DisplayFont}" FontSize="30" FontWeight="SemiBold" />
-                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                    <Ellipse Width="9" Height="9" Fill="{Binding StatusBrush}" VerticalAlignment="Center" />
-                                    <TextBlock Text="{Binding StatusTitle}" FontWeight="SemiBold" Margin="9,0,0,0" />
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="24,0,0,0">
+                                    <ui:BatteryGauge Width="132" Height="58" Percent="{Binding BatteryPercent}"
+                                                     Charging="{Binding IsCharging}" Connected="{Binding IsConnected}" />
+                                    <TextBlock Text="{Binding BatteryText}" FontFamily="{StaticResource DisplayFont}" FontSize="28" FontWeight="SemiBold"
+                                               HorizontalAlignment="Center" Margin="0,10,0,0" />
+                                    <TextBlock Text="{Binding PowerText}" Foreground="{StaticResource Subtext}" FontSize="12" HorizontalAlignment="Center" />
                                 </StackPanel>
-                                <TextBlock Text="{Binding StatusDetail}" Style="{StaticResource Hint}" FontSize="13" Margin="0,6,0,0" MaxWidth="460" HorizontalAlignment="Left" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="24,0,0,0">
-                                <ui:BatteryGauge Width="132" Height="58" Percent="{Binding BatteryPercent}"
-                                                 Charging="{Binding IsCharging}" Connected="{Binding IsConnected}" />
-                                <TextBlock Text="{Binding BatteryText}" FontFamily="{StaticResource DisplayFont}" FontSize="28" FontWeight="SemiBold"
-                                           HorizontalAlignment="Center" Margin="0,10,0,0" />
-                                <TextBlock Text="{Binding PowerText}" Foreground="{StaticResource Subtext}" FontSize="12" HorizontalAlignment="Center" />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}" Background="{StaticResource WarningSoft}" BorderBrush="#55FBBF24"
-                            Visibility="{Binding ShowUsbipMissing, Converter={StaticResource Visible}}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource Warning}" VerticalAlignment="Top" Margin="0,2,14,0" />
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="usbip-win2 is not installed" Style="{StaticResource CardTitle}" />
-                                <TextBlock Style="{StaticResource Hint}" Text="It provides the virtual USB port that lets games see a wired DualSense. Battery and lighting work without it; haptics, speaker and mic need it." />
-                            </StackPanel>
-                            <Button Grid.Column="2" Content="Install usbip-win2" Style="{StaticResource AccentButton}" VerticalAlignment="Center" Margin="16,0,0,0"
-                                    Command="{Binding OpenSetup}" />
-                        </Grid>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}" Visibility="{Binding ShowHidHideMissing, Converter={StaticResource Visible}}">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="&#xE946;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="Recommended: HidHide" Style="{StaticResource CardTitle}" />
-                                <TextBlock Style="{StaticResource Hint}" Text="Hides the Bluetooth controller so Steam and games don't see two DualSenses." />
-                            </StackPanel>
-                            <Button Grid.Column="2" Content="Install HidHide" Style="{StaticResource GhostButton}" VerticalAlignment="Center" Margin="16,0,0,0"
-                                    Command="{Binding OpenSetup}" />
-                        </Grid>
-                    </Border>
-
-                    <UniformGrid Columns="3" Margin="-6,0">
-                        <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
-                            <StackPanel>
-                                <TextBlock Text="&#xE702;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{StaticResource AccentLight}" />
-                                <TextBlock Text="Bluetooth link" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
-                                <TextBlock Text="{Binding RateText}" FontSize="18" FontWeight="SemiBold" />
-                                <TextBlock Text="input report rate" Style="{StaticResource Hint}" />
-                            </StackPanel>
+                            </Grid>
                         </Border>
-                        <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
-                            <StackPanel>
-                                <TextBlock Text="&#xE88E;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{Binding VirtualBrush}" />
-                                <TextBlock Text="Wired mode" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
-                                <TextBlock Text="{Binding VirtualText}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Border>
-                        <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
-                            <StackPanel>
-                                <TextBlock Text="&#xE767;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{StaticResource AccentLight}" />
-                                <TextBlock Text="Audio" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
-                                <TextBlock Text="{Binding StreamsText}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
-                            </StackPanel>
-                        </Border>
-                    </UniformGrid>
 
-                    <WrapPanel>
-                        <Border Style="{StaticResource Pill}"><TextBlock Text="{Binding HeadsetText}" FontSize="12" /></Border>
-                        <Border Style="{StaticResource Pill}"><TextBlock Text="{Binding MicMutedText}" FontSize="12" /></Border>
-                        <Border Style="{StaticResource Pill}">
-                            <StackPanel Orientation="Horizontal">
-                                <Ellipse Width="7" Height="7" Fill="{Binding HidHideBrush}" VerticalAlignment="Center" Margin="0,0,7,0" />
-                                <TextBlock Text="{Binding HidHideText}" FontSize="12" />
-                            </StackPanel>
+                        <Border Style="{StaticResource CardBorder}" Background="{StaticResource WarningSoft}" BorderBrush="#55FBBF24"
+                                Visibility="{Binding ShowUsbipMissing, Converter={StaticResource Visible}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE7BA;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource Warning}" VerticalAlignment="Top" Margin="0,2,14,0" />
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="usbip-win2 is not installed" Style="{StaticResource CardTitle}" />
+                                    <TextBlock Style="{StaticResource Hint}" Text="It provides the virtual USB port that lets games see a wired DualSense. Battery and lighting work without it; haptics, speaker and mic need it." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Install usbip-win2" Style="{StaticResource AccentButton}" VerticalAlignment="Center" Margin="16,0,0,0"
+                                        Command="{Binding OpenSetup}" />
+                            </Grid>
                         </Border>
-                    </WrapPanel>
-                </StackPanel>
-            </ScrollViewer>
+                        <Border Style="{StaticResource CardBorder}" Visibility="{Binding ShowHidHideMissing, Converter={StaticResource Visible}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE946;" FontFamily="{StaticResource IconFont}" FontSize="20" Foreground="{StaticResource AccentLight}" VerticalAlignment="Top" Margin="0,2,14,0" />
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="Recommended: HidHide" Style="{StaticResource CardTitle}" />
+                                    <TextBlock Style="{StaticResource Hint}" Text="Hides the Bluetooth controller so Steam and games don't see two DualSenses." />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Install HidHide" Style="{StaticResource GhostButton}" VerticalAlignment="Center" Margin="16,0,0,0"
+                                        Command="{Binding OpenSetup}" />
+                            </Grid>
+                        </Border>
 
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavGames, Converter={StaticResource Visible}}">
-                <StackPanel Margin="36,30,36,24" MaxWidth="980">
-                    <TextBlock Text="Games" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="Detects installed and running games, looks up their DualSense support on PCGamingWiki and applies their profiles." Style="{StaticResource PageSubtitle}" />
-
-                    <Border Style="{StaticResource CardBorder}" Background="{StaticResource HeroGradient}" Padding="24,20"
-                            Visibility="{Binding HasGame, Converter={StaticResource Visible}}">
-                        <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                            <Border Width="56" Height="56" CornerRadius="12" Background="#22FFFFFF" VerticalAlignment="Top" Margin="0,4,18,0">
-                                <Image Source="{Binding GameIcon}" Width="40" Height="40" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                        <UniformGrid Columns="3" Margin="-6,0">
+                            <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
+                                <StackPanel>
+                                    <TextBlock Text="&#xE702;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{StaticResource AccentLight}" />
+                                    <TextBlock Text="Bluetooth link" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
+                                    <TextBlock Text="{Binding RateText}" FontSize="18" FontWeight="SemiBold" />
+                                    <TextBlock Text="input report rate" Style="{StaticResource Hint}" />
+                                </StackPanel>
                             </Border>
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="NOW PLAYING" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentLight}" />
-                                <TextBlock Text="{Binding GameTitle}" FontFamily="{StaticResource DisplayFont}" FontSize="24" FontWeight="SemiBold" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
-                                <TextBlock Text="{Binding GameSource}" Style="{StaticResource Hint}" />
-                                <Border HorizontalAlignment="Left" CornerRadius="11" Padding="10,4" Margin="0,12,0,0" Background="{Binding GameModeBrush}">
-                                    <TextBlock Text="{Binding GameModeText}" FontSize="12" FontWeight="SemiBold" Foreground="White" />
-                                </Border>
-                                <TextBlock Text="{Binding GameVerdict}" Style="{StaticResource Hint}" FontSize="13" Margin="0,10,0,0" MaxWidth="520" HorizontalAlignment="Left" />
-                                <TextBlock Text="{Binding GameModeNote}" Style="{StaticResource Hint}" Foreground="{StaticResource Warning}" Margin="0,4,0,0"
-                                           Visibility="{Binding HasGameModeNote, Converter={StaticResource Visible}}" />
-                            </StackPanel>
-                            <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="20,0,0,0">
-                                <Button Content="Show overlay" Style="{StaticResource AccentButton}" Command="{Binding ShowOverlayNow}" />
-                            </StackPanel>
-                        </Grid>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}" Visibility="{Binding NoGame, Converter={StaticResource Visible}}">
-                        <Grid>
-                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                            <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource IconFont}" FontSize="22" Foreground="{StaticResource Subtext}" VerticalAlignment="Center" Margin="0,0,16,0" />
-                            <StackPanel Grid.Column="1">
-                                <TextBlock Text="No game running" Style="{StaticResource CardTitle}" />
-                                <TextBlock Text="Launch a game and its DualSense features appear here and in the overlay. Press Ctrl+Alt+Z in game to show the overlay again." Style="{StaticResource Hint}" />
-                            </StackPanel>
-                            <Button Grid.Column="2" Content="Preview overlay" Style="{StaticResource GhostButton}" Command="{Binding ShowOverlayNow}" VerticalAlignment="Center" Margin="16,0,0,0" />
-                        </Grid>
-                    </Border>
+                            <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
+                                <StackPanel>
+                                    <TextBlock Text="&#xE88E;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{Binding VirtualBrush}" />
+                                    <TextBlock Text="Wired mode" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
+                                    <TextBlock Text="{Binding VirtualText}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                            <Border Style="{StaticResource CardBorder}" Margin="6,0,6,12">
+                                <StackPanel>
+                                    <TextBlock Text="&#xE767;" FontFamily="{StaticResource IconFont}" FontSize="18" Foreground="{StaticResource AccentLight}" />
+                                    <TextBlock Text="Audio" Foreground="{StaticResource Subtext}" FontSize="12" Margin="0,10,0,2" />
+                                    <TextBlock Text="{Binding StreamsText}" FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap" />
+                                </StackPanel>
+                            </Border>
+                        </UniformGrid>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="300" />
-                            <ColumnDefinition Width="12" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Border Style="{StaticResource CardBorder}" Padding="10,14" VerticalAlignment="Top">
+                        <WrapPanel>
+                            <Border Style="{StaticResource Pill}"><TextBlock Text="{Binding HeadsetText}" FontSize="12" /></Border>
+                            <Border Style="{StaticResource Pill}"><TextBlock Text="{Binding MicMutedText}" FontSize="12" /></Border>
+                            <Border Style="{StaticResource Pill}">
+                                <StackPanel Orientation="Horizontal">
+                                    <Ellipse Width="7" Height="7" Fill="{Binding HidHideBrush}" VerticalAlignment="Center" Margin="0,0,7,0" />
+                                    <TextBlock Text="{Binding HidHideText}" FontSize="12" />
+                                </StackPanel>
+                            </Border>
+                        </WrapPanel>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavGames, Converter={StaticResource Visible}}">
+                    <StackPanel Margin="36,30,36,24" MaxWidth="980">
+                        <TextBlock Text="Games" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="Detects installed and running games, looks up their DualSense support on PCGamingWiki and applies their profiles." Style="{StaticResource PageSubtitle}" />
+
+                        <Border Style="{StaticResource CardBorder}" Background="{StaticResource HeroGradient}" Padding="24,20"
+                                Visibility="{Binding HasGame, Converter={StaticResource Visible}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <Border Width="56" Height="56" CornerRadius="12" Background="#22FFFFFF" VerticalAlignment="Top" Margin="0,4,18,0">
+                                    <Image Source="{Binding GameIcon}" Width="40" Height="40" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                </Border>
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="NOW PLAYING" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentLight}" />
+                                    <TextBlock Text="{Binding GameTitle}" FontFamily="{StaticResource DisplayFont}" FontSize="24" FontWeight="SemiBold" Margin="0,4,0,0" TextTrimming="CharacterEllipsis" />
+                                    <TextBlock Text="{Binding GameSource}" Style="{StaticResource Hint}" />
+                                    <Border HorizontalAlignment="Left" CornerRadius="11" Padding="10,4" Margin="0,12,0,0" Background="{Binding GameModeBrush}">
+                                        <TextBlock Text="{Binding GameModeText}" FontSize="12" FontWeight="SemiBold" Foreground="White" />
+                                    </Border>
+                                    <TextBlock Text="{Binding GameVerdict}" Style="{StaticResource Hint}" FontSize="13" Margin="0,10,0,0" MaxWidth="520" HorizontalAlignment="Left" />
+                                    <TextBlock Text="{Binding GameModeNote}" Style="{StaticResource Hint}" Foreground="{StaticResource Warning}" Margin="0,4,0,0"
+                                               Visibility="{Binding HasGameModeNote, Converter={StaticResource Visible}}" />
+                                </StackPanel>
+                                <StackPanel Grid.Column="2" VerticalAlignment="Center" Margin="20,0,0,0">
+                                    <Button Content="Show overlay" Style="{StaticResource AccentButton}" Command="{Binding ShowOverlayNow}" />
+                                </StackPanel>
+                            </Grid>
+                        </Border>
+                        <Border Style="{StaticResource CardBorder}" Visibility="{Binding NoGame, Converter={StaticResource Visible}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource IconFont}" FontSize="22" Foreground="{StaticResource Subtext}" VerticalAlignment="Center" Margin="0,0,16,0" />
+                                <StackPanel Grid.Column="1">
+                                    <TextBlock Text="No game running" Style="{StaticResource CardTitle}" />
+                                    <TextBlock Text="Launch a game and its DualSense features appear here and in the overlay. Press Ctrl+Alt+Z in game to show the overlay again." Style="{StaticResource Hint}" />
+                                </StackPanel>
+                                <Button Grid.Column="2" Content="Preview overlay" Style="{StaticResource GhostButton}" Command="{Binding ShowOverlayNow}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                            </Grid>
+                        </Border>
+
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="300" />
+                                <ColumnDefinition Width="12" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Border Style="{StaticResource CardBorder}" Padding="10,14" VerticalAlignment="Top">
+                                <StackPanel>
+                                    <Grid Margin="10,0,6,10">
+                                        <TextBlock Text="Your games" Style="{StaticResource CardTitle}" />
+                                        <Button Content="Add game" Style="{StaticResource LinkButton}" Command="{Binding AddGame}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                    </Grid>
+                                    <Grid Margin="6,0,6,8">
+                                        <TextBox Text="{Binding GameFilter, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
+                                        <TextBlock Text="Search games" Foreground="#6B7385" FontSize="13" Margin="10,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
+                                                   Visibility="{Binding FilterEmpty, Converter={StaticResource Visible}}" />
+                                    </Grid>
+                                    <Grid Margin="10,0,6,10">
+                                        <TextBlock Text="Show installed games" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="0" />
+                                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowInstalledGames}" />
+                                    </Grid>
+                                    <ListBox ItemsSource="{Binding GameList}" SelectedItem="{Binding SelectedGame}" Background="Transparent" BorderThickness="0"
+                                             ItemContainerStyle="{StaticResource GameItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" MaxHeight="560"
+                                             VirtualizingPanel.IsVirtualizing="True">
+                                        <ListBox.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid>
+                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                                    <Border Width="32" Height="32" CornerRadius="7" Background="#16FFFFFF" Margin="0,0,10,0">
+                                                        <Grid>
+                                                            <TextBlock Text="{Binding Initial}" FontWeight="SemiBold" Foreground="{StaticResource Subtext}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                       Visibility="{Binding HasIcon, Converter={StaticResource Hidden}}" />
+                                                            <Image Source="{Binding Icon}" Width="26" Height="26" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
+                                                        </Grid>
+                                                    </Border>
+                                                    <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                                        <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{StaticResource Text}" TextTrimming="CharacterEllipsis" />
+                                                        <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{StaticResource Subtext}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ListBox.ItemTemplate>
+                                    </ListBox>
+                                    <TextBlock Text="No games found. Use Add game to pick a game's .exe." Style="{StaticResource Hint}" Margin="10,4,10,4"
+                                               Visibility="{Binding HasGames, Converter={StaticResource Hidden}}" />
+                                </StackPanel>
+                            </Border>
+
+                            <StackPanel Grid.Column="2" Visibility="{Binding HasSelection, Converter={StaticResource Visible}}">
+                                <Border Style="{StaticResource CardBorder}">
+                                    <StackPanel>
+                                        <Grid>
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
+                                            <Border CornerRadius="8" Margin="0,0,16,0" VerticalAlignment="Top" ClipToBounds="True"
+                                                    Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
+                                                <Image Source="{Binding SelectedCover}" Width="92" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
+                                            </Border>
+                                            <Border Width="56" Height="56" CornerRadius="12" Background="#16FFFFFF" Margin="0,0,16,0" VerticalAlignment="Top"
+                                                    Visibility="{Binding HasCover, Converter={StaticResource Hidden}}">
+                                                <Image Source="{Binding SelectedIcon}" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality" />
+                                            </Border>
+                                            <StackPanel Grid.Column="1">
+                                                <TextBlock Text="{Binding SelectedName}" Style="{StaticResource CardTitle}" FontSize="18" TextWrapping="Wrap" />
+                                                <TextBlock Text="{Binding SelectedSource}" Style="{StaticResource Hint}" />
+                                                <WrapPanel Margin="0,10,0,0">
+                                                    <TextBlock Text="{Binding MatchText}" FontSize="12" Foreground="{StaticResource Text}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" />
+                                                    <Button Content="Change" Style="{StaticResource LinkButton}" Command="{Binding ToggleMatch}" VerticalAlignment="Center" />
+                                                </WrapPanel>
+                                                <TextBlock Text="{Binding SelectedVerdict}" Style="{StaticResource Hint}" Margin="0,6,0,0" />
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <Border Background="#0AFFFFFF" CornerRadius="8" Padding="12" Margin="0,14,0,0"
+                                                Visibility="{Binding Matching, Converter={StaticResource Visible}}">
+                                            <StackPanel>
+                                                <TextBlock Text="Match this game to a PCGamingWiki page" Style="{StaticResource Label}" FontSize="13" />
+                                                <Grid Margin="0,8,0,8">
+                                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                    <TextBox Text="{Binding MatchQuery, UpdateSourceTrigger=PropertyChanged}">
+                                                        <TextBox.InputBindings>
+                                                            <KeyBinding Key="Enter" Command="{Binding SearchMatch}" />
+                                                        </TextBox.InputBindings>
+                                                    </TextBox>
+                                                    <Button Grid.Column="1" Content="Search" Style="{StaticResource AccentButton}" Command="{Binding SearchMatch}" Margin="8,0,0,0" />
+                                                </Grid>
+                                                <TextBlock Text="Searching…" Style="{StaticResource Hint}" Visibility="{Binding Searching, Converter={StaticResource Visible}}" />
+                                                <ItemsControl ItemsSource="{Binding MatchResults}">
+                                                    <ItemsControl.ItemTemplate>
+                                                        <DataTemplate>
+                                                            <Button Content="{Binding}" Style="{StaticResource LinkButton}" Margin="0,3" HorizontalAlignment="Left"
+                                                                    Command="{Binding DataContext.PickMatch, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
+                                                        </DataTemplate>
+                                                    </ItemsControl.ItemTemplate>
+                                                </ItemsControl>
+                                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
+                                                    <Button Content="Not on PCGamingWiki" Style="{StaticResource GhostButton}" Command="{Binding NoMatch}" Margin="0,0,8,0" />
+                                                    <Button Content="Match automatically" Style="{StaticResource GhostButton}" Command="{Binding AutoMatch}" />
+                                                </StackPanel>
+                                            </StackPanel>
+                                        </Border>
+
+                                        <ItemsControl ItemsSource="{Binding SelectedRows}" ItemTemplate="{StaticResource FeatureRowTemplate}" Margin="0,12,0,0"
+                                                      Visibility="{Binding HasSelectedPcgw, Converter={StaticResource Visible}}" />
+                                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                                            <Button Content="Open on PCGamingWiki" Style="{StaticResource LinkButton}" Margin="0,0,18,0"
+                                                    Command="{Binding OpenUrl}" CommandParameter="{Binding SelectedPcgwUrl}"
+                                                    Visibility="{Binding HasSelectedPcgw, Converter={StaticResource Visible}}" />
+                                            <Button Content="Refresh" Style="{StaticResource LinkButton}" Command="{Binding RefreshPcgw}" Margin="0,0,18,0" />
+                                            <Button Content="Not a game" Style="{StaticResource LinkButton}" Command="{Binding NotAGame}" Foreground="{StaticResource Subtext}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
+                                        Visibility="{Binding HasPromptMod, Converter={StaticResource Visible}}">
+                                    <StackPanel>
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="{StaticResource AccentLight}" VerticalAlignment="Center" Margin="0,0,10,0" />
+                                            <TextBlock Text="{Binding PromptModTitle}" Style="{StaticResource CardTitle}" />
+                                        </StackPanel>
+                                        <TextBlock Text="{Binding PromptModText}" FontSize="13" Foreground="{StaticResource Text}" TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="20" />
+                                        <ItemsControl ItemsSource="{Binding PromptModLinks}" Margin="0,12,0,0">
+                                            <ItemsControl.ItemsPanel>
+                                                <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
+                                            </ItemsControl.ItemsPanel>
+                                            <ItemsControl.ItemTemplate>
+                                                <DataTemplate>
+                                                    <Button Style="{StaticResource GhostButton}" Margin="0,0,8,8" ToolTip="{Binding Url}"
+                                                            Command="{Binding DataContext.OpenLink, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Url}">
+                                                        <StackPanel>
+                                                            <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
+                                                            <TextBlock Text="{Binding Host}" FontSize="11" Foreground="{StaticResource Subtext}" />
+                                                        </StackPanel>
+                                                    </Button>
+                                                </DataTemplate>
+                                            </ItemsControl.ItemTemplate>
+                                        </ItemsControl>
+                                        <TextBlock Text="From PCGamingWiki. Mods are made by third parties; check their pages before installing." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                </Border>
+
+                                <Border Style="{StaticResource CardBorder}">
+                                    <StackPanel>
+                                        <TextBlock Text="Profile" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Controller mode" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Auto follows PCGamingWiki: Xbox 360 mode when the game lacks DualSense support." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <RadioButton GroupName="mode" Style="{StaticResource Segment}" Content="Auto" IsChecked="{Binding ProfileMode, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                                    <RadioButton GroupName="mode" Style="{StaticResource Segment}" Content="DualSense" IsChecked="{Binding ProfileMode, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                                    <RadioButton GroupName="mode" Style="{StaticResource Segment}" Content="Xbox 360" IsChecked="{Binding ProfileMode, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                        <Border Style="{StaticResource Divider}" />
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Custom haptics strength" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Otherwise uses the global setting." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding OverrideHaptics}" />
+                                        </Grid>
+                                        <Grid Style="{StaticResource Row}" Visibility="{Binding OverrideHaptics, Converter={StaticResource Visible}}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <Slider Minimum="1" Maximum="2" SmallChange="0.05" LargeChange="0.1" TickFrequency="0.05" IsSnapToTickEnabled="True" Value="{Binding ProfileHaptics}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ProfileHapticsText}" Style="{StaticResource Value}" />
+                                        </Grid>
+                                        <Border Style="{StaticResource Divider}" />
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Custom trigger strength" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Weaker trigger motors just for this game." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding OverrideTriggers}" />
+                                        </Grid>
+                                        <Grid Style="{StaticResource Row}" Visibility="{Binding OverrideTriggers, Converter={StaticResource Visible}}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <Slider Minimum="0" Maximum="10" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding ProfileTriggers}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ProfileTriggersText}" Style="{StaticResource Value}" />
+                                        </Grid>
+                                        <Border Style="{StaticResource Divider}" />
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Custom lightbar colour" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Shown while this game runs (unless the game sets its own)." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding OverrideLightbar}" />
+                                        </Grid>
+                                        <StackPanel Orientation="Horizontal" Margin="0,6,0,4" Visibility="{Binding OverrideLightbar, Converter={StaticResource Visible}}">
+                                            <Border Width="60" Height="26" CornerRadius="6" Background="{Binding ProfileLightbarBrush}" Margin="0,0,14,0" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#FFD700" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#0040FF" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#00E5FF" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#00FF66" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#FF2D2D" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#FF00B8" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#8A2BE2" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#FFFFFF" />
+                                            <Button Style="{StaticResource ProfileSwatch}" Tag="#000000" />
+                                        </StackPanel>
+                                        <Border Style="{StaticResource Divider}" />
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Haptics from game audio" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Override the global choice for this game." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <RadioButton GroupName="pah" Style="{StaticResource Segment}" Content="Global" IsChecked="{Binding ProfileAudioHaptics, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                                    <RadioButton GroupName="pah" Style="{StaticResource Segment}" Content="On" IsChecked="{Binding ProfileAudioHaptics, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                                    <RadioButton GroupName="pah" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding ProfileAudioHaptics, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                        <Border Style="{StaticResource Divider}" />
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Adaptive trigger effects" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Edit this game's effects in the Trigger Lab." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <RadioButton GroupName="ptm2" Style="{StaticResource Segment}" Content="Global" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                                    <RadioButton GroupName="ptm2" Style="{StaticResource Segment}" Content="Game" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                                    <RadioButton GroupName="ptm2" Style="{StaticResource Segment}" Content="Custom" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                    </StackPanel>
+                                </Border>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavAudio, Converter={StaticResource Visible}}">
+                    <StackPanel Margin="36,30,36,24" MaxWidth="900">
+                        <TextBlock Text="Audio &amp; haptics" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="HD haptics and the controller speaker are streamed over Bluetooth. Changes apply instantly." Style="{StaticResource PageSubtitle}" />
+
+                        <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
-                                <Grid Margin="10,0,6,10">
-                                    <TextBlock Text="Your games" Style="{StaticResource CardTitle}" />
-                                    <Button Content="Add game" Style="{StaticResource LinkButton}" Command="{Binding AddGame}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                <TextBlock Text="Haptics" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Haptics strength" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Boosts the game's haptic feedback (100% = as the game sends it)." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="1" Maximum="2" SmallChange="0.05" LargeChange="0.1" TickFrequency="0.05"
+                                            IsSnapToTickEnabled="True" Value="{Binding HapticsGain}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding HapticsGainText}" Style="{StaticResource Value}" />
                                 </Grid>
-                                <Grid Margin="6,0,6,8">
-                                    <TextBox Text="{Binding GameFilter, UpdateSourceTrigger=PropertyChanged, Delay=200}" />
-                                    <TextBlock Text="Search games" Foreground="#6B7385" FontSize="13" Margin="10,0,0,0" VerticalAlignment="Center" IsHitTestVisible="False"
-                                               Visibility="{Binding FilterEmpty, Converter={StaticResource Visible}}" />
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Xbox 360 mode" Style="{StaticResource CardTitle}" Margin="0,0,0,2" />
+                                <TextBlock Text="For games without DualSense support. Windows sees an Xbox 360 controller and its rumble plays on the DualSense." Style="{StaticResource Hint}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Switch automatically" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Use Xbox 360 mode when PCGamingWiki lists no DualSense support. Per-game profiles can override this." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding AutoXboxMode}" />
                                 </Grid>
-                                <Grid Margin="10,0,6,10">
-                                    <TextBlock Text="Show installed games" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="0" />
-                                    <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowInstalledGames}" />
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Rumble style" Style="{StaticResource Label}" />
+                                        <TextBlock Text="HD haptics plays the heavy motor at 60 Hz on the left grip and the light one at 160 Hz on the right. Classic uses the controller's rumble emulation." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="rumble" Style="{StaticResource Segment}" Content="HD haptics" IsChecked="{Binding RumbleStyle, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="rumble" Style="{StaticResource Segment}" Content="Classic" IsChecked="{Binding RumbleStyle, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                        </StackPanel>
+                                    </Border>
                                 </Grid>
-                                <ListBox ItemsSource="{Binding GameList}" SelectedItem="{Binding SelectedGame}" Background="Transparent" BorderThickness="0"
-                                         ItemContainerStyle="{StaticResource GameItem}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" MaxHeight="560"
-                                         VirtualizingPanel.IsVirtualizing="True">
-                                    <ListBox.ItemTemplate>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" /><ColumnDefinition Width="220" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Rumble strength" Style="{StaticResource Label}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="200" SmallChange="5" LargeChange="10" TickFrequency="5"
+                                            IsSnapToTickEnabled="True" Value="{Binding RumbleStrength}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding RumbleStrengthText}" Style="{StaticResource Value}" />
+                                    <Button Grid.Column="3" Content="Test" Style="{StaticResource GhostButton}" Command="{Binding TestRumble}" Margin="14,0,0,0" VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Haptics from game audio" Style="{StaticResource CardTitle}" Margin="0,0,0,2" />
+                                <TextBlock Text="Turns the game's bass into haptics. Only the game's audio is used, not music or voice chat." Style="{StaticResource Hint}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Use for" Style="{StaticResource Label}" />
+                                        <TextBlock Text="&quot;Games without haptics&quot; skips games whose own HD haptics PCGamingWiki confirms. Per-game profiles can override this." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="ah" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding AudioHapticsMode, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="ah" Style="{StaticResource Segment}" Content="Games without haptics" IsChecked="{Binding AudioHapticsMode, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                            <RadioButton GroupName="ah" Style="{StaticResource Segment}" Content="All games" IsChecked="{Binding AudioHapticsMode, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                                <Grid Margin="0,4,0,6">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding AudioHapticsStatus}" Style="{StaticResource Hint}" VerticalAlignment="Center" />
+                                    <Border Grid.Column="1" Width="240" Height="8" CornerRadius="4" Background="#14FFFFFF">
+                                        <Border HorizontalAlignment="Left" Width="{Binding AudioLevel}" CornerRadius="4" Background="{StaticResource Success}" />
+                                    </Border>
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Intensity" Style="{StaticResource Label}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="300" SmallChange="5" LargeChange="10" TickFrequency="5" IsSnapToTickEnabled="True"
+                                            Value="{Binding AudioHapticsIntensity}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding AudioHapticsIntensityText}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Bass cut-off" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Lower feels only deep hits; higher adds more detail." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="30" Maximum="250" SmallChange="5" LargeChange="10" TickFrequency="5" IsSnapToTickEnabled="True"
+                                            Value="{Binding AudioHapticsCutoff}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding AudioHapticsCutoffText}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Noise gate" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Ignores quiet background rumble." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="30" SmallChange="1" LargeChange="2" TickFrequency="1" IsSnapToTickEnabled="True"
+                                            Value="{Binding AudioHapticsGate}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding AudioHapticsGateText}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Smoothness" Style="{StaticResource Label}" />
+                                        <TextBlock Text="How long each hit lingers." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="20" Maximum="400" SmallChange="10" LargeChange="20" TickFrequency="10" IsSnapToTickEnabled="True"
+                                            Value="{Binding AudioHapticsSmoothness}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding AudioHapticsSmoothnessText}" Style="{StaticResource Value}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Speaker &amp; microphone" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Audio output" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Auto uses headphones when plugged into the controller. Off sends haptics only and saves bandwidth." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Auto" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Speaker" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                            <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Headphones" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                            <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=3}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Microphone" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Shows up in Windows as a recording device." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Auto" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Built-in" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                            <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Headset" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                            <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=3}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Speaker boost" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Extra pre-gain on the controller speaker." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="7" SmallChange="1" LargeChange="1" TickFrequency="1"
+                                            IsSnapToTickEnabled="True" Value="{Binding SpeakerGain}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding SpeakerGainText}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Lock volume" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Ignore volume and mute changes from Windows and games." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding LockVolume}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Bluetooth streaming" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Packet mode" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Double sends two audio frames per packet (fewer, bigger packets). Try Single if audio stutters." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="pkt" Style="{StaticResource Segment}" Content="Double" IsChecked="{Binding PacketMode, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="pkt" Style="{StaticResource Segment}" Content="Single" IsChecked="{Binding PacketMode, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Controller audio buffer" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Higher survives a busy Bluetooth link; lower reduces latency." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Slider x:Name="BufSlider" Grid.Column="1" Minimum="16" Maximum="128" SmallChange="1" LargeChange="8" TickFrequency="1"
+                                            IsSnapToTickEnabled="True" Value="{Binding AudioBufferLength}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding Value, ElementName=BufSlider}" Style="{StaticResource Value}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavTriggers, Converter={StaticResource Visible}}">
+                    <StackPanel Margin="36,30,36,24" MaxWidth="900">
+                        <TextBlock Text="Trigger Lab" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="Add adaptive triggers to any game, or replace a game's own effects." Style="{StaticResource PageSubtitle}" />
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Editing" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Global effects apply to every game; a game's own effects win while it runs." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="tgt" Style="{StaticResource Segment}" Content="All games" IsChecked="{Binding TriggerLab.Target, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="tgt" Style="{StaticResource Segment}" Content="{Binding TriggerLab.GameTargetName}" IsEnabled="{Binding TriggerLab.HasGameTarget}"
+                                                         IsChecked="{Binding TriggerLab.Target, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                                <Grid Margin="0,12,0,0" Visibility="{Binding TriggerLab.EditingGame, Converter={StaticResource Visible}}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Triggers in this game" Style="{StaticResource Label}" />
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="ptm" Style="{StaticResource Segment}" Content="Use global" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="ptm" Style="{StaticResource Segment}" Content="Game controls" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                            <RadioButton GroupName="ptm" Style="{StaticResource Segment}" Content="Custom" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <UniformGrid Columns="2" Margin="-6,0">
+                            <ContentControl Content="{Binding TriggerLab.Left}" ContentTemplate="{StaticResource TriggerEditorTemplate}" Margin="6,0" />
+                            <ContentControl Content="{Binding TriggerLab.Right}" ContentTemplate="{StaticResource TriggerEditorTemplate}" Margin="6,0" />
+                        </UniformGrid>
+                        <UniformGrid Columns="2" Margin="-6,0,-6,0">
+                            <Button Content="Save L2 effect to library" Style="{StaticResource LinkButton}" Command="{Binding TriggerLab.SaveLeft}" Margin="10,0,0,14" HorizontalAlignment="Left" />
+                            <Button Content="Save R2 effect to library" Style="{StaticResource LinkButton}" Command="{Binding TriggerLab.SaveRight}" Margin="10,0,0,14" HorizontalAlignment="Left" />
+                        </UniformGrid>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Capture from a game" Style="{StaticResource CardTitle}" />
+                                <TextBlock Text="The last trigger effect a game sent in DualSense mode. Save it to use in games that have none." Style="{StaticResource Hint}" Margin="0,2,0,10" />
+                                <TextBlock Text="{Binding TriggerLab.CapturedText}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="{StaticResource Subtext}" />
+                                <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding TriggerLab.HasCaptured, Converter={StaticResource Visible}}">
+                                    <Button Content="Use on L2" Style="{StaticResource GhostButton}" Command="{Binding TriggerLab.UseCapturedLeft}" Margin="0,0,8,0" />
+                                    <Button Content="Use on R2" Style="{StaticResource GhostButton}" Command="{Binding TriggerLab.UseCapturedRight}" />
+                                </StackPanel>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}" Visibility="{Binding TriggerLab.HasLibrary, Converter={StaticResource Visible}}">
+                            <StackPanel>
+                                <TextBlock Text="Effect library" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <ItemsControl ItemsSource="{Binding TriggerLab.Library}">
+                                    <ItemsControl.ItemTemplate>
                                         <DataTemplate>
-                                            <Grid>
-                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                                                <Border Width="32" Height="32" CornerRadius="7" Background="#16FFFFFF" Margin="0,0,10,0">
-                                                    <Grid>
-                                                        <TextBlock Text="{Binding Initial}" FontWeight="SemiBold" Foreground="{StaticResource Subtext}" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                                   Visibility="{Binding HasIcon, Converter={StaticResource Hidden}}" />
-                                                        <Image Source="{Binding Icon}" Width="26" Height="26" Stretch="UniformToFill" RenderOptions.BitmapScalingMode="HighQuality" />
-                                                    </Grid>
-                                                </Border>
-                                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                                                    <TextBlock Text="{Binding Name}" FontSize="13" Foreground="{StaticResource Text}" TextTrimming="CharacterEllipsis" />
-                                                    <TextBlock Text="{Binding Detail}" FontSize="11" Foreground="{StaticResource Subtext}" Margin="0,2,0,0" TextTrimming="CharacterEllipsis" />
+                                            <Grid Margin="0,5">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <StackPanel>
+                                                    <TextBlock Text="{Binding Name}" FontSize="13" />
+                                                    <TextBlock Text="{Binding Detail}" Style="{StaticResource Hint}" />
+                                                </StackPanel>
+                                                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                                                    <Button Content="L2" Style="{StaticResource GhostButton}" Padding="12,5" Margin="0,0,6,0" CommandParameter="{Binding}"
+                                                            Command="{Binding DataContext.TriggerLab.UseLeft, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                    <Button Content="R2" Style="{StaticResource GhostButton}" Padding="12,5" Margin="0,0,12,0" CommandParameter="{Binding}"
+                                                            Command="{Binding DataContext.TriggerLab.UseRight, RelativeSource={RelativeSource AncestorType=Window}}" />
+                                                    <Button Content="Delete" Style="{StaticResource LinkButton}" VerticalAlignment="Center" CommandParameter="{Binding}"
+                                                            Command="{Binding DataContext.TriggerLab.Delete, RelativeSource={RelativeSource AncestorType=Window}}" />
                                                 </StackPanel>
                                             </Grid>
                                         </DataTemplate>
-                                    </ListBox.ItemTemplate>
-                                </ListBox>
-                                <TextBlock Text="No games found. Use Add game to pick a game's .exe." Style="{StaticResource Hint}" Margin="10,4,10,4"
-                                           Visibility="{Binding HasGames, Converter={StaticResource Hidden}}" />
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
                             </StackPanel>
                         </Border>
 
-                        <StackPanel Grid.Column="2" Visibility="{Binding HasSelection, Converter={StaticResource Visible}}">
-                            <Border Style="{StaticResource CardBorder}">
-                                <StackPanel>
-                                    <Grid>
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /></Grid.ColumnDefinitions>
-                                        <Border CornerRadius="8" Margin="0,0,16,0" VerticalAlignment="Top" ClipToBounds="True"
-                                                Visibility="{Binding HasCover, Converter={StaticResource Visible}}">
-                                            <Image Source="{Binding SelectedCover}" Width="92" Stretch="Uniform" RenderOptions.BitmapScalingMode="HighQuality" />
-                                        </Border>
-                                        <Border Width="56" Height="56" CornerRadius="12" Background="#16FFFFFF" Margin="0,0,16,0" VerticalAlignment="Top"
-                                                Visibility="{Binding HasCover, Converter={StaticResource Hidden}}">
-                                            <Image Source="{Binding SelectedIcon}" Width="40" Height="40" RenderOptions.BitmapScalingMode="HighQuality" />
-                                        </Border>
-                                        <StackPanel Grid.Column="1">
-                                            <TextBlock Text="{Binding SelectedName}" Style="{StaticResource CardTitle}" FontSize="18" TextWrapping="Wrap" />
-                                            <TextBlock Text="{Binding SelectedSource}" Style="{StaticResource Hint}" />
-                                            <WrapPanel Margin="0,10,0,0">
-                                                <TextBlock Text="{Binding MatchText}" FontSize="12" Foreground="{StaticResource Text}" VerticalAlignment="Center" TextWrapping="Wrap" Margin="0,0,10,0" />
-                                                <Button Content="Change" Style="{StaticResource LinkButton}" Command="{Binding ToggleMatch}" VerticalAlignment="Center" />
-                                            </WrapPanel>
-                                            <TextBlock Text="{Binding SelectedVerdict}" Style="{StaticResource Hint}" Margin="0,6,0,0" />
-                                        </StackPanel>
-                                    </Grid>
-
-                                    <Border Background="#0AFFFFFF" CornerRadius="8" Padding="12" Margin="0,14,0,0"
-                                            Visibility="{Binding Matching, Converter={StaticResource Visible}}">
-                                        <StackPanel>
-                                            <TextBlock Text="Match this game to a PCGamingWiki page" Style="{StaticResource Label}" FontSize="13" />
-                                            <Grid Margin="0,8,0,8">
-                                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                                <TextBox Text="{Binding MatchQuery, UpdateSourceTrigger=PropertyChanged}">
-                                                    <TextBox.InputBindings>
-                                                        <KeyBinding Key="Enter" Command="{Binding SearchMatch}" />
-                                                    </TextBox.InputBindings>
-                                                </TextBox>
-                                                <Button Grid.Column="1" Content="Search" Style="{StaticResource AccentButton}" Command="{Binding SearchMatch}" Margin="8,0,0,0" />
-                                            </Grid>
-                                            <TextBlock Text="Searching…" Style="{StaticResource Hint}" Visibility="{Binding Searching, Converter={StaticResource Visible}}" />
-                                            <ItemsControl ItemsSource="{Binding MatchResults}">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate>
-                                                        <Button Content="{Binding}" Style="{StaticResource LinkButton}" Margin="0,3" HorizontalAlignment="Left"
-                                                                Command="{Binding DataContext.PickMatch, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding}" />
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0">
-                                                <Button Content="Not on PCGamingWiki" Style="{StaticResource GhostButton}" Command="{Binding NoMatch}" Margin="0,0,8,0" />
-                                                <Button Content="Match automatically" Style="{StaticResource GhostButton}" Command="{Binding AutoMatch}" />
-                                            </StackPanel>
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Motors" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Trigger strength" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Weakens the trigger motors without changing the effect's shape." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="10" SmallChange="1" LargeChange="1" TickFrequency="1"
+                                            IsSnapToTickEnabled="True" Value="{Binding TriggerReduce}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding TriggerReduceText}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Rumble kicks the triggers (Xbox 360 mode)" Style="{StaticResource Label}" />
+                                        <TextBlock Text="The game's rumble also vibrates the triggers." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="kick" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding TriggerLab.Kick, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="kick" Style="{StaticResource Segment}" Content="Both" IsChecked="{Binding TriggerLab.Kick, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                            <RadioButton GroupName="kick" Style="{StaticResource Segment}" Content="R2 only" IsChecked="{Binding TriggerLab.Kick, Converter={StaticResource Option}, ConverterParameter=2}" />
                                         </StackPanel>
                                     </Border>
-
-                                    <ItemsControl ItemsSource="{Binding SelectedRows}" ItemTemplate="{StaticResource FeatureRowTemplate}" Margin="0,12,0,0"
-                                                  Visibility="{Binding HasSelectedPcgw, Converter={StaticResource Visible}}" />
-                                    <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-                                        <Button Content="Open on PCGamingWiki" Style="{StaticResource LinkButton}" Margin="0,0,18,0"
-                                                Command="{Binding OpenUrl}" CommandParameter="{Binding SelectedPcgwUrl}"
-                                                Visibility="{Binding HasSelectedPcgw, Converter={StaticResource Visible}}" />
-                                        <Button Content="Refresh" Style="{StaticResource LinkButton}" Command="{Binding RefreshPcgw}" Margin="0,0,18,0" />
-                                        <Button Content="Not a game" Style="{StaticResource LinkButton}" Command="{Binding NotAGame}" Foreground="{StaticResource Subtext}" />
-                                    </StackPanel>
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource CardBorder}" BorderBrush="#553B82F6" Background="{StaticResource AccentSoft}"
-                                    Visibility="{Binding HasPromptMod, Converter={StaticResource Visible}}">
-                                <StackPanel>
-                                    <StackPanel Orientation="Horizontal">
-                                        <TextBlock Text="&#xE7FC;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="{StaticResource AccentLight}" VerticalAlignment="Center" Margin="0,0,10,0" />
-                                        <TextBlock Text="{Binding PromptModTitle}" Style="{StaticResource CardTitle}" />
-                                    </StackPanel>
-                                    <TextBlock Text="{Binding PromptModText}" FontSize="13" Foreground="{StaticResource Text}" TextWrapping="Wrap" Margin="0,10,0,0" LineHeight="20" />
-                                    <ItemsControl ItemsSource="{Binding PromptModLinks}" Margin="0,12,0,0">
-                                        <ItemsControl.ItemsPanel>
-                                            <ItemsPanelTemplate><WrapPanel /></ItemsPanelTemplate>
-                                        </ItemsControl.ItemsPanel>
-                                        <ItemsControl.ItemTemplate>
-                                            <DataTemplate>
-                                                <Button Style="{StaticResource GhostButton}" Margin="0,0,8,8" ToolTip="{Binding Url}"
-                                                        Command="{Binding DataContext.OpenLink, RelativeSource={RelativeSource AncestorType=Window}}" CommandParameter="{Binding Url}">
-                                                    <StackPanel>
-                                                        <TextBlock Text="{Binding Label}" FontWeight="SemiBold" />
-                                                        <TextBlock Text="{Binding Host}" FontSize="11" Foreground="{StaticResource Subtext}" />
-                                                    </StackPanel>
-                                                </Button>
-                                            </DataTemplate>
-                                        </ItemsControl.ItemTemplate>
-                                    </ItemsControl>
-                                    <TextBlock Text="From PCGamingWiki. Mods are made by third parties; check their pages before installing." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                            </Border>
-
-                            <Border Style="{StaticResource CardBorder}">
-                                <StackPanel>
-                                    <TextBlock Text="Profile" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                                    <Grid Style="{StaticResource Row}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Controller mode" Style="{StaticResource Label}" />
-                                            <TextBlock Text="Auto follows PCGamingWiki: Xbox 360 mode when the game lacks DualSense support." Style="{StaticResource Hint}" />
-                                        </StackPanel>
-                                        <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                            <StackPanel Orientation="Horizontal">
-                                                <RadioButton GroupName="mode" Style="{StaticResource Segment}" Content="Auto" IsChecked="{Binding ProfileMode, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                                <RadioButton GroupName="mode" Style="{StaticResource Segment}" Content="DualSense" IsChecked="{Binding ProfileMode, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                                <RadioButton GroupName="mode" Style="{StaticResource Segment}" Content="Xbox 360" IsChecked="{Binding ProfileMode, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                    <Border Style="{StaticResource Divider}" />
-                                    <Grid Style="{StaticResource Row}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Custom haptics strength" Style="{StaticResource Label}" />
-                                            <TextBlock Text="Otherwise uses the global setting." Style="{StaticResource Hint}" />
-                                        </StackPanel>
-                                        <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding OverrideHaptics}" />
-                                    </Grid>
-                                    <Grid Style="{StaticResource Row}" Visibility="{Binding OverrideHaptics, Converter={StaticResource Visible}}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <Slider Minimum="1" Maximum="2" SmallChange="0.05" LargeChange="0.1" TickFrequency="0.05" IsSnapToTickEnabled="True" Value="{Binding ProfileHaptics}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding ProfileHapticsText}" Style="{StaticResource Value}" />
-                                    </Grid>
-                                    <Border Style="{StaticResource Divider}" />
-                                    <Grid Style="{StaticResource Row}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Custom trigger strength" Style="{StaticResource Label}" />
-                                            <TextBlock Text="Weaker trigger motors just for this game." Style="{StaticResource Hint}" />
-                                        </StackPanel>
-                                        <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding OverrideTriggers}" />
-                                    </Grid>
-                                    <Grid Style="{StaticResource Row}" Visibility="{Binding OverrideTriggers, Converter={StaticResource Visible}}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <Slider Minimum="0" Maximum="10" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding ProfileTriggers}" />
-                                        <TextBlock Grid.Column="1" Text="{Binding ProfileTriggersText}" Style="{StaticResource Value}" />
-                                    </Grid>
-                                    <Border Style="{StaticResource Divider}" />
-                                    <Grid Style="{StaticResource Row}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Custom lightbar colour" Style="{StaticResource Label}" />
-                                            <TextBlock Text="Shown while this game runs (unless the game sets its own)." Style="{StaticResource Hint}" />
-                                        </StackPanel>
-                                        <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding OverrideLightbar}" />
-                                    </Grid>
-                                    <StackPanel Orientation="Horizontal" Margin="0,6,0,4" Visibility="{Binding OverrideLightbar, Converter={StaticResource Visible}}">
-                                        <Border Width="60" Height="26" CornerRadius="6" Background="{Binding ProfileLightbarBrush}" Margin="0,0,14,0" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#FFD700" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#0040FF" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#00E5FF" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#00FF66" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#FF2D2D" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#FF00B8" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#8A2BE2" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#FFFFFF" />
-                                        <Button Style="{StaticResource ProfileSwatch}" Tag="#000000" />
-                                    </StackPanel>
-                                    <Border Style="{StaticResource Divider}" />
-                                    <Grid Style="{StaticResource Row}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Haptics from game audio" Style="{StaticResource Label}" />
-                                            <TextBlock Text="Override the global choice for this game." Style="{StaticResource Hint}" />
-                                        </StackPanel>
-                                        <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                            <StackPanel Orientation="Horizontal">
-                                                <RadioButton GroupName="pah" Style="{StaticResource Segment}" Content="Global" IsChecked="{Binding ProfileAudioHaptics, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                                <RadioButton GroupName="pah" Style="{StaticResource Segment}" Content="On" IsChecked="{Binding ProfileAudioHaptics, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                                <RadioButton GroupName="pah" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding ProfileAudioHaptics, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                    <Border Style="{StaticResource Divider}" />
-                                    <Grid Style="{StaticResource Row}">
-                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                        <StackPanel VerticalAlignment="Center">
-                                            <TextBlock Text="Adaptive trigger effects" Style="{StaticResource Label}" />
-                                            <TextBlock Text="Edit this game's effects in the Trigger Lab." Style="{StaticResource Hint}" />
-                                        </StackPanel>
-                                        <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                            <StackPanel Orientation="Horizontal">
-                                                <RadioButton GroupName="ptm2" Style="{StaticResource Segment}" Content="Global" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                                <RadioButton GroupName="ptm2" Style="{StaticResource Segment}" Content="Game" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                                <RadioButton GroupName="ptm2" Style="{StaticResource Segment}" Content="Custom" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                            </StackPanel>
-                                        </Border>
-                                    </Grid>
-                                </StackPanel>
-                            </Border>
-                        </StackPanel>
-                    </Grid>
-                </StackPanel>
-            </ScrollViewer>
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavAudio, Converter={StaticResource Visible}}">
-                <StackPanel Margin="36,30,36,24" MaxWidth="900">
-                    <TextBlock Text="Audio &amp; haptics" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="HD haptics and the controller speaker are streamed over Bluetooth. Changes apply instantly." Style="{StaticResource PageSubtitle}" />
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Haptics" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Haptics strength" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Boosts the game's haptic feedback (100% = as the game sends it)." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="1" Maximum="2" SmallChange="0.05" LargeChange="0.1" TickFrequency="0.05"
-                                        IsSnapToTickEnabled="True" Value="{Binding HapticsGain}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding HapticsGainText}" Style="{StaticResource Value}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Xbox 360 mode" Style="{StaticResource CardTitle}" Margin="0,0,0,2" />
-                            <TextBlock Text="For games without DualSense support. Windows sees an Xbox 360 controller and its rumble plays on the DualSense." Style="{StaticResource Hint}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Switch automatically" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Use Xbox 360 mode when PCGamingWiki lists no DualSense support. Per-game profiles can override this." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding AutoXboxMode}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Rumble style" Style="{StaticResource Label}" />
-                                    <TextBlock Text="HD haptics plays the heavy motor at 60 Hz on the left grip and the light one at 160 Hz on the right. Classic uses the controller's rumble emulation." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="rumble" Style="{StaticResource Segment}" Content="HD haptics" IsChecked="{Binding RumbleStyle, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="rumble" Style="{StaticResource Segment}" Content="Classic" IsChecked="{Binding RumbleStyle, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="220" /><ColumnDefinition Width="Auto" /><ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Rumble strength" Style="{StaticResource Label}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="0" Maximum="200" SmallChange="5" LargeChange="10" TickFrequency="5"
-                                        IsSnapToTickEnabled="True" Value="{Binding RumbleStrength}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding RumbleStrengthText}" Style="{StaticResource Value}" />
-                                <Button Grid.Column="3" Content="Test" Style="{StaticResource GhostButton}" Command="{Binding TestRumble}" Margin="14,0,0,0" VerticalAlignment="Center" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Haptics from game audio" Style="{StaticResource CardTitle}" Margin="0,0,0,2" />
-                            <TextBlock Text="Turns the game's bass into haptics. Only the game's audio is used, not music or voice chat." Style="{StaticResource Hint}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Use for" Style="{StaticResource Label}" />
-                                    <TextBlock Text="&quot;Games without haptics&quot; skips games whose own HD haptics PCGamingWiki confirms. Per-game profiles can override this." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="ah" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding AudioHapticsMode, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="ah" Style="{StaticResource Segment}" Content="Games without haptics" IsChecked="{Binding AudioHapticsMode, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                        <RadioButton GroupName="ah" Style="{StaticResource Segment}" Content="All games" IsChecked="{Binding AudioHapticsMode, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <Grid Margin="0,4,0,6">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="{Binding AudioHapticsStatus}" Style="{StaticResource Hint}" VerticalAlignment="Center" />
-                                <Border Grid.Column="1" Width="240" Height="8" CornerRadius="4" Background="#14FFFFFF">
-                                    <Border HorizontalAlignment="Left" Width="{Binding AudioLevel}" CornerRadius="4" Background="{StaticResource Success}" />
-                                </Border>
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Intensity" Style="{StaticResource Label}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="0" Maximum="300" SmallChange="5" LargeChange="10" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Value="{Binding AudioHapticsIntensity}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding AudioHapticsIntensityText}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Bass cut-off" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Lower feels only deep hits; higher adds more detail." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="30" Maximum="250" SmallChange="5" LargeChange="10" TickFrequency="5" IsSnapToTickEnabled="True"
-                                        Value="{Binding AudioHapticsCutoff}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding AudioHapticsCutoffText}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Noise gate" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Ignores quiet background rumble." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="0" Maximum="30" SmallChange="1" LargeChange="2" TickFrequency="1" IsSnapToTickEnabled="True"
-                                        Value="{Binding AudioHapticsGate}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding AudioHapticsGateText}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Smoothness" Style="{StaticResource Label}" />
-                                    <TextBlock Text="How long each hit lingers." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="20" Maximum="400" SmallChange="10" LargeChange="20" TickFrequency="10" IsSnapToTickEnabled="True"
-                                        Value="{Binding AudioHapticsSmoothness}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding AudioHapticsSmoothnessText}" Style="{StaticResource Value}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Speaker &amp; microphone" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Audio output" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Auto uses headphones when plugged into the controller. Off sends haptics only and saves bandwidth." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Auto" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Speaker" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                        <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Headphones" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                        <RadioButton GroupName="spk" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding SpeakerSelect, Converter={StaticResource Option}, ConverterParameter=3}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Microphone" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Shows up in Windows as a recording device." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Auto" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Built-in" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                        <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Headset" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                        <RadioButton GroupName="mic" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding MicSelect, Converter={StaticResource Option}, ConverterParameter=3}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Speaker boost" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Extra pre-gain on the controller speaker." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="0" Maximum="7" SmallChange="1" LargeChange="1" TickFrequency="1"
-                                        IsSnapToTickEnabled="True" Value="{Binding SpeakerGain}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding SpeakerGainText}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Lock volume" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Ignore volume and mute changes from Windows and games." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding LockVolume}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Bluetooth streaming" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Packet mode" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Double sends two audio frames per packet (fewer, bigger packets). Try Single if audio stutters." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="pkt" Style="{StaticResource Segment}" Content="Double" IsChecked="{Binding PacketMode, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="pkt" Style="{StaticResource Segment}" Content="Single" IsChecked="{Binding PacketMode, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Controller audio buffer" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Higher survives a busy Bluetooth link; lower reduces latency." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Slider x:Name="BufSlider" Grid.Column="1" Minimum="16" Maximum="128" SmallChange="1" LargeChange="8" TickFrequency="1"
-                                        IsSnapToTickEnabled="True" Value="{Binding AudioBufferLength}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding Value, ElementName=BufSlider}" Style="{StaticResource Value}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavTriggers, Converter={StaticResource Visible}}">
-                <StackPanel Margin="36,30,36,24" MaxWidth="900">
-                    <TextBlock Text="Trigger Lab" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="Add adaptive triggers to any game, or replace a game's own effects." Style="{StaticResource PageSubtitle}" />
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Editing" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Global effects apply to every game; a game's own effects win while it runs." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="tgt" Style="{StaticResource Segment}" Content="All games" IsChecked="{Binding TriggerLab.Target, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="tgt" Style="{StaticResource Segment}" Content="{Binding TriggerLab.GameTargetName}" IsEnabled="{Binding TriggerLab.HasGameTarget}"
-                                                     IsChecked="{Binding TriggerLab.Target, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                            <Grid Margin="0,12,0,0" Visibility="{Binding TriggerLab.EditingGame, Converter={StaticResource Visible}}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Triggers in this game" Style="{StaticResource Label}" />
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="ptm" Style="{StaticResource Segment}" Content="Use global" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="ptm" Style="{StaticResource Segment}" Content="Game controls" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                        <RadioButton GroupName="ptm" Style="{StaticResource Segment}" Content="Custom" IsChecked="{Binding TriggerLab.ProfileTriggerMode, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <UniformGrid Columns="2" Margin="-6,0">
-                        <ContentControl Content="{Binding TriggerLab.Left}" ContentTemplate="{StaticResource TriggerEditorTemplate}" Margin="6,0" />
-                        <ContentControl Content="{Binding TriggerLab.Right}" ContentTemplate="{StaticResource TriggerEditorTemplate}" Margin="6,0" />
-                    </UniformGrid>
-                    <UniformGrid Columns="2" Margin="-6,0,-6,0">
-                        <Button Content="Save L2 effect to library" Style="{StaticResource LinkButton}" Command="{Binding TriggerLab.SaveLeft}" Margin="10,0,0,14" HorizontalAlignment="Left" />
-                        <Button Content="Save R2 effect to library" Style="{StaticResource LinkButton}" Command="{Binding TriggerLab.SaveRight}" Margin="10,0,0,14" HorizontalAlignment="Left" />
-                    </UniformGrid>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Capture from a game" Style="{StaticResource CardTitle}" />
-                            <TextBlock Text="The last trigger effect a game sent in DualSense mode. Save it to use in games that have none." Style="{StaticResource Hint}" Margin="0,2,0,10" />
-                            <TextBlock Text="{Binding TriggerLab.CapturedText}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="{StaticResource Subtext}" />
-                            <StackPanel Orientation="Horizontal" Margin="0,10,0,0" Visibility="{Binding TriggerLab.HasCaptured, Converter={StaticResource Visible}}">
-                                <Button Content="Use on L2" Style="{StaticResource GhostButton}" Command="{Binding TriggerLab.UseCapturedLeft}" Margin="0,0,8,0" />
-                                <Button Content="Use on R2" Style="{StaticResource GhostButton}" Command="{Binding TriggerLab.UseCapturedRight}" />
+                                </Grid>
                             </StackPanel>
-                        </StackPanel>
-                    </Border>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
 
-                    <Border Style="{StaticResource CardBorder}" Visibility="{Binding TriggerLab.HasLibrary, Converter={StaticResource Visible}}">
-                        <StackPanel>
-                            <TextBlock Text="Effect library" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <ItemsControl ItemsSource="{Binding TriggerLab.Library}">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Grid Margin="0,5">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                            <StackPanel>
-                                                <TextBlock Text="{Binding Name}" FontSize="13" />
-                                                <TextBlock Text="{Binding Detail}" Style="{StaticResource Hint}" />
-                                            </StackPanel>
-                                            <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
-                                                <Button Content="L2" Style="{StaticResource GhostButton}" Padding="12,5" Margin="0,0,6,0" CommandParameter="{Binding}"
-                                                        Command="{Binding DataContext.TriggerLab.UseLeft, RelativeSource={RelativeSource AncestorType=Window}}" />
-                                                <Button Content="R2" Style="{StaticResource GhostButton}" Padding="12,5" Margin="0,0,12,0" CommandParameter="{Binding}"
-                                                        Command="{Binding DataContext.TriggerLab.UseRight, RelativeSource={RelativeSource AncestorType=Window}}" />
-                                                <Button Content="Delete" Style="{StaticResource LinkButton}" VerticalAlignment="Center" CommandParameter="{Binding}"
-                                                        Command="{Binding DataContext.TriggerLab.Delete, RelativeSource={RelativeSource AncestorType=Window}}" />
-                                            </StackPanel>
-                                        </Grid>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Motors" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" />
-                                </Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Trigger strength" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Weakens the trigger motors without changing the effect's shape." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Slider Grid.Column="1" Minimum="0" Maximum="10" SmallChange="1" LargeChange="1" TickFrequency="1"
-                                        IsSnapToTickEnabled="True" Value="{Binding TriggerReduce}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding TriggerReduceText}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Rumble kicks the triggers (Xbox 360 mode)" Style="{StaticResource Label}" />
-                                    <TextBlock Text="The game's rumble also vibrates the triggers." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
-                                    <StackPanel Orientation="Horizontal">
-                                        <RadioButton GroupName="kick" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding TriggerLab.Kick, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                        <RadioButton GroupName="kick" Style="{StaticResource Segment}" Content="Both" IsChecked="{Binding TriggerLab.Kick, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                        <RadioButton GroupName="kick" Style="{StaticResource Segment}" Content="R2 only" IsChecked="{Binding TriggerLab.Kick, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                    </StackPanel>
-                                </Border>
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavLighting, Converter={StaticResource Visible}}">
-                <StackPanel Margin="36,30,36,24" MaxWidth="900">
-                    <TextBlock Text="Lighting" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="Lightbar colour and effects. Games that set the lightbar themselves take over while they run." Style="{StaticResource PageSubtitle}" />
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Effect" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Border Style="{StaticResource SegmentHost}" HorizontalAlignment="Left">
-                                <StackPanel Orientation="Horizontal">
-                                    <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Static" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=0}" />
-                                    <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Breathing" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=1}" />
-                                    <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Rainbow" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=2}" />
-                                    <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Battery level" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=3}" />
-                                    <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Audio reactive" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=4}" />
-                                </StackPanel>
-                            </Border>
-                            <TextBlock Text="{Binding LightingHint}" Style="{StaticResource Hint}" Margin="0,8,0,0" />
-                            <Grid Style="{StaticResource Row}" Visibility="{Binding ShowLightingSpeed, Converter={StaticResource Visible}}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Speed" Style="{StaticResource Label}" />
-                                <Slider Grid.Column="1" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding LightingSpeed}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <Border Height="64" CornerRadius="10" Background="{Binding LightbarBrush}" Margin="0,0,0,18">
-                                <Border.Effect>
-                                    <DropShadowEffect Color="{Binding LightbarBrush.Color}" BlurRadius="40" ShadowDepth="0" Opacity="0.55" />
-                                </Border.Effect>
-                                <TextBlock Text="{Binding LightbarHex}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,14,10"
-                                           FontSize="12" FontWeight="SemiBold" Foreground="#CC000000" />
-                            </Border>
-                            <TextBlock Text="Presets" Style="{StaticResource Label}" Margin="0,0,0,10" />
-                            <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
-                                <Button Style="{StaticResource Swatch}" Tag="#FFD700" ToolTip="Gold" />
-                                <Button Style="{StaticResource Swatch}" Tag="#0040FF" ToolTip="PlayStation blue" />
-                                <Button Style="{StaticResource Swatch}" Tag="#00E5FF" ToolTip="Cyan" />
-                                <Button Style="{StaticResource Swatch}" Tag="#00FF66" ToolTip="Green" />
-                                <Button Style="{StaticResource Swatch}" Tag="#FF2D2D" ToolTip="Red" />
-                                <Button Style="{StaticResource Swatch}" Tag="#FF00B8" ToolTip="Pink" />
-                                <Button Style="{StaticResource Swatch}" Tag="#8A2BE2" ToolTip="Purple" />
-                                <Button Style="{StaticResource Swatch}" Tag="#FFFFFF" ToolTip="White" />
-                                <Button Style="{StaticResource Swatch}" Tag="#000000" ToolTip="Off" />
-                            </StackPanel>
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="70" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Red" Style="{StaticResource Label}" />
-                                <Slider Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="16" Value="{Binding LedR}" />
-                                <TextBlock Grid.Column="2" Text="{Binding LedR, StringFormat=F0}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="70" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Green" Style="{StaticResource Label}" />
-                                <Slider Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="16" Value="{Binding LedG}" />
-                                <TextBlock Grid.Column="2" Text="{Binding LedG, StringFormat=F0}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="70" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Blue" Style="{StaticResource Label}" />
-                                <Slider Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="16" Value="{Binding LedB}" />
-                                <TextBlock Grid.Column="2" Text="{Binding LedB, StringFormat=F0}" Style="{StaticResource Value}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
-
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavSettings, Converter={StaticResource Visible}}">
-                <StackPanel Margin="36,30,36,24" MaxWidth="900">
-                    <TextBlock Text="Settings" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="Startup, notifications, the game overlay and the virtual USB connection." Style="{StaticResource PageSubtitle}" />
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="General" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Start with Windows" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Runs at sign-in in the tray, without a UAC prompt." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding StartWithWindows}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Start minimized" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Open straight to the tray." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding StartMinimized}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Low battery alert" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Notify when the controller drops to 10%." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding LowBatteryAlert}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <Grid>
-                                <StackPanel>
-                                    <TextBlock Text="Updates" Style="{StaticResource CardTitle}" />
-                                    <TextBlock Text="{Binding CurrentVersionText}" Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <Button Content="Check now" Style="{StaticResource GhostButton}" Command="{Binding CheckUpdates}" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                            </Grid>
-                            <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" Foreground="{StaticResource AccentLight}" Margin="0,6,0,0" />
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Check for updates automatically" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Looks at the GitHub releases on start and twice a day. Nothing is installed without asking." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding AutoCheckUpdates}" />
-                            </Grid>
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Include alpha and beta versions" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Pre-releases get new features first and may have rough edges." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding IncludePrereleases}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-
-                    <Border Style="{StaticResource CardBorder}">
-                        <Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavLighting, Converter={StaticResource Visible}}">
+                    <StackPanel Margin="36,30,36,24" MaxWidth="900">
+                        <TextBlock Text="Lighting" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="Lightbar colour and effects. Games that set the lightbar themselves take over while they run." Style="{StaticResource PageSubtitle}" />
+                        <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
-                                <TextBlock Text="Drivers" Style="{StaticResource CardTitle}" />
-                                <TextBlock Text="{Binding DriversText}" Style="{StaticResource Hint}" />
+                                <TextBlock Text="Effect" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Border Style="{StaticResource SegmentHost}" HorizontalAlignment="Left">
+                                    <StackPanel Orientation="Horizontal">
+                                        <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Static" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                        <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Breathing" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                        <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Rainbow" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                        <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Battery level" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=3}" />
+                                        <RadioButton GroupName="lm" Style="{StaticResource Segment}" Content="Audio reactive" IsChecked="{Binding LightingMode, Converter={StaticResource Option}, ConverterParameter=4}" />
+                                    </StackPanel>
+                                </Border>
+                                <TextBlock Text="{Binding LightingHint}" Style="{StaticResource Hint}" Margin="0,8,0,0" />
+                                <Grid Style="{StaticResource Row}" Visibility="{Binding ShowLightingSpeed, Converter={StaticResource Visible}}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Speed" Style="{StaticResource Label}" />
+                                    <Slider Grid.Column="1" Minimum="1" Maximum="10" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding LightingSpeed}" />
+                                </Grid>
                             </StackPanel>
-                            <Button Content="Manage" Style="{StaticResource GhostButton}" Command="{Binding OpenSetup}" HorizontalAlignment="Right" VerticalAlignment="Center" />
-                        </Grid>
-                    </Border>
+                        </Border>
 
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <Grid Margin="0,0,0,4">
-                                <TextBlock Text="Game library" Style="{StaticResource CardTitle}" />
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                                    <Button Content="Rescan" Style="{StaticResource GhostButton}" Command="{Binding RescanGames}" Margin="0,0,8,0" />
-                                    <Button Content="Add folder" Style="{StaticResource AccentButton}" Command="{Binding AddGameFolder}" />
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <Border Height="64" CornerRadius="10" Background="{Binding LightbarBrush}" Margin="0,0,0,18">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="{Binding LightbarBrush.Color}" BlurRadius="40" ShadowDepth="0" Opacity="0.55" />
+                                    </Border.Effect>
+                                    <TextBlock Text="{Binding LightbarHex}" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,14,10"
+                                               FontSize="12" FontWeight="SemiBold" Foreground="#CC000000" />
+                                </Border>
+                                <TextBlock Text="Presets" Style="{StaticResource Label}" Margin="0,0,0,10" />
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,18">
+                                    <Button Style="{StaticResource Swatch}" Tag="#FFD700" ToolTip="Gold" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#0040FF" ToolTip="PlayStation blue" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#00E5FF" ToolTip="Cyan" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#00FF66" ToolTip="Green" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#FF2D2D" ToolTip="Red" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#FF00B8" ToolTip="Pink" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#8A2BE2" ToolTip="Purple" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#FFFFFF" ToolTip="White" />
+                                    <Button Style="{StaticResource Swatch}" Tag="#000000" ToolTip="Off" />
                                 </StackPanel>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="70" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Red" Style="{StaticResource Label}" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="16" Value="{Binding LedR}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding LedR, StringFormat=F0}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="70" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Green" Style="{StaticResource Label}" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="16" Value="{Binding LedG}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding LedG, StringFormat=F0}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="70" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Blue" Style="{StaticResource Label}" />
+                                    <Slider Grid.Column="1" Minimum="0" Maximum="255" SmallChange="1" LargeChange="16" Value="{Binding LedB}" />
+                                    <TextBlock Grid.Column="2" Text="{Binding LedB, StringFormat=F0}" Style="{StaticResource Value}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavSettings, Converter={StaticResource Visible}}">
+                    <StackPanel Margin="36,30,36,24" MaxWidth="900">
+                        <TextBlock Text="Settings" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="Startup, notifications, the game overlay and the virtual USB connection." Style="{StaticResource PageSubtitle}" />
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="General" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Start with Windows" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Runs at sign-in in the tray, without a UAC prompt." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding StartWithWindows}" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Start minimized" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Open straight to the tray." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding StartMinimized}" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Low battery alert" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Notify when the controller drops to 10%." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding LowBatteryAlert}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <Grid>
+                                    <StackPanel>
+                                        <TextBlock Text="Updates" Style="{StaticResource CardTitle}" />
+                                        <TextBlock Text="{Binding CurrentVersionText}" Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <Button Content="Check now" Style="{StaticResource GhostButton}" Command="{Binding CheckUpdates}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                                </Grid>
+                                <Grid Margin="0,6,0,0">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding UpdateStatus}" Style="{StaticResource Hint}" Foreground="{StaticResource AccentLight}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                                    <Button Grid.Column="1" Content="{Binding InstallUpdateText}" Style="{StaticResource AccentButton}" Command="{Binding InstallUpdate}"
+                                            IsEnabled="{Binding CanInstallUpdate}" Visibility="{Binding UpdateAvailable, Converter={StaticResource Visible}}" Margin="16,0,0,0" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Check for updates automatically" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Looks at the GitHub releases on start and twice a day, and downloads new versions in the background. Nothing is installed until you restart to update." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding AutoCheckUpdates}" />
+                                </Grid>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Include alpha and beta versions" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Pre-releases get new features first and may have rough edges." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding IncludePrereleases}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <Grid>
+                                <StackPanel>
+                                    <TextBlock Text="Drivers" Style="{StaticResource CardTitle}" />
+                                    <TextBlock Text="{Binding DriversText}" Style="{StaticResource Hint}" />
+                                </StackPanel>
+                                <Button Content="Manage" Style="{StaticResource GhostButton}" Command="{Binding OpenSetup}" HorizontalAlignment="Right" VerticalAlignment="Center" />
                             </Grid>
-                            <TextBlock Text="Launcher games are found automatically. Every folder inside these folders counts as one game, named from its installer entry, Steam or GOG files, or the folder name." Style="{StaticResource Hint}" Margin="0,0,0,10" />
-                            <ItemsControl ItemsSource="{Binding GameFolders}">
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,4">
+                                    <TextBlock Text="Game library" Style="{StaticResource CardTitle}" />
+                                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                        <Button Content="Rescan" Style="{StaticResource GhostButton}" Command="{Binding RescanGames}" Margin="0,0,8,0" />
+                                        <Button Content="Add folder" Style="{StaticResource AccentButton}" Command="{Binding AddGameFolder}" />
+                                    </StackPanel>
+                                </Grid>
+                                <TextBlock Text="Launcher games are found automatically. Every folder inside these folders counts as one game, named from its installer entry, Steam or GOG files, or the folder name." Style="{StaticResource Hint}" Margin="0,0,0,10" />
+                                <ItemsControl ItemsSource="{Binding GameFolders}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="0,4">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                                <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="{StaticResource AccentLight}" VerticalAlignment="Center" Margin="0,0,12,0" />
+                                                <StackPanel Grid.Column="1">
+                                                    <TextBlock Text="{Binding Path}" FontSize="13" />
+                                                    <TextBlock Text="{Binding Detail}" Style="{StaticResource Hint}" Margin="0" />
+                                                </StackPanel>
+                                                <Button Grid.Column="2" Content="Remove" Style="{StaticResource LinkButton}" VerticalAlignment="Center" CommandParameter="{Binding}"
+                                                        Command="{Binding DataContext.RemoveGameFolder, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                        Visibility="{Binding Auto, Converter={StaticResource Hidden}}" />
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                                <TextBlock Text="No game folders yet. Add the folder where you keep games that aren't in a launcher." Style="{StaticResource Hint}"
+                                           Visibility="{Binding HasGameFolders, Converter={StaticResource Hidden}}" />
+                                <Grid Margin="0,12,0,0" Visibility="{Binding HasHiddenGames, Converter={StaticResource Visible}}">
+                                    <TextBlock Text="{Binding HiddenGamesText}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="0" />
+                                    <Button Content="Show them again" Style="{StaticResource LinkButton}" Command="{Binding UnhideGames}" HorizontalAlignment="Right" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Game overlay" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Show overlay when a game starts" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Lists the game's DualSense features. Ctrl+Alt+Z shows it any time. Not visible over exclusive-fullscreen games." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding ShowOverlay}" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <TextBlock Text="Overlay duration" Style="{StaticResource Label}" />
+                                    <Slider Grid.Column="1" Minimum="3" Maximum="30" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True"
+                                            Value="{Binding OverlaySeconds}" Margin="16,0,0,0" />
+                                    <TextBlock Grid.Column="2" Text="{Binding OverlaySecondsText}" Style="{StaticResource Value}" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Detect other fullscreen games" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Steam, Epic and GOG games are always detected. This also catches fullscreen 3D apps from elsewhere." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding DetectFullscreenApps}" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <TextBlock Text="Connection" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="Hide Bluetooth controller (HidHide)" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Games then only see the virtual wired DualSense. Applies on the next connection." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding UseHidHide}" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="340" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="usbip.exe location" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Leave empty to find it automatically." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <TextBox Grid.Column="1" Text="{Binding UsbipPath, UpdateSourceTrigger=LostFocus}" Margin="16,0,8,0" VerticalAlignment="Center" />
+                                    <Button Grid.Column="2" Content="Browse" Style="{StaticResource GhostButton}" Command="{Binding BrowseUsbip}" VerticalAlignment="Center" />
+                                </Grid>
+                                <Border Style="{StaticResource Divider}" />
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="110" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock Text="USB/IP port" Style="{StaticResource Label}" />
+                                        <TextBlock Text="Only change if another app uses 3240. Applies after restarting Zerk Sense 5." Style="{StaticResource Hint}" />
+                                    </StackPanel>
+                                    <TextBox Grid.Column="1" Text="{Binding UsbipPort, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center" />
+                                </Grid>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <DockPanel Margin="36,30,36,24" Visibility="{Binding IsChecked, ElementName=NavLog, Converter={StaticResource Visible}}">
+                    <StackPanel DockPanel.Dock="Top">
+                        <TextBlock Text="Activity log" Style="{StaticResource PageTitle}" />
+                        <TextBlock Text="What the bridge has been doing. Useful when something doesn't connect." Style="{StaticResource PageSubtitle}" />
+                    </StackPanel>
+                    <Border Style="{StaticResource CardBorder}" Padding="14,10" Margin="0">
+                        <ScrollViewer x:Name="LogScroll" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding LogLines}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Grid Margin="0,4">
-                                            <Grid.ColumnDefinitions><ColumnDefinition Width="Auto" /><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                            <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource IconFont}" FontSize="16" Foreground="{StaticResource AccentLight}" VerticalAlignment="Center" Margin="0,0,12,0" />
-                                            <StackPanel Grid.Column="1">
-                                                <TextBlock Text="{Binding Path}" FontSize="13" />
-                                                <TextBlock Text="{Binding Detail}" Style="{StaticResource Hint}" Margin="0" />
-                                            </StackPanel>
-                                            <Button Grid.Column="2" Content="Remove" Style="{StaticResource LinkButton}" VerticalAlignment="Center" CommandParameter="{Binding}"
-                                                    Command="{Binding DataContext.RemoveGameFolder, RelativeSource={RelativeSource AncestorType=Window}}"
-                                                    Visibility="{Binding Auto, Converter={StaticResource Hidden}}" />
-                                        </Grid>
+                                        <StackPanel Orientation="Horizontal" Margin="0,2">
+                                            <TextBlock Text="{Binding Time}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="#5A6273" Width="70" />
+                                            <TextBlock Text="{Binding Tag}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="{Binding TagBrush}" Width="44" />
+                                            <TextBlock Text="{Binding Message}" FontFamily="Cascadia Mono, Consolas" FontSize="12" TextWrapping="Wrap" />
+                                        </StackPanel>
                                     </DataTemplate>
                                 </ItemsControl.ItemTemplate>
                             </ItemsControl>
-                            <TextBlock Text="No game folders yet. Add the folder where you keep games that aren't in a launcher." Style="{StaticResource Hint}"
-                                       Visibility="{Binding HasGameFolders, Converter={StaticResource Hidden}}" />
-                            <Grid Margin="0,12,0,0" Visibility="{Binding HasHiddenGames, Converter={StaticResource Visible}}">
-                                <TextBlock Text="{Binding HiddenGamesText}" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="0" />
-                                <Button Content="Show them again" Style="{StaticResource LinkButton}" Command="{Binding UnhideGames}" HorizontalAlignment="Right" />
-                            </Grid>
-                        </StackPanel>
+                        </ScrollViewer>
                     </Border>
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Game overlay" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Show overlay when a game starts" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Lists the game's DualSense features. Ctrl+Alt+Z shows it any time. Not visible over exclusive-fullscreen games." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding ShowOverlay}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <TextBlock Text="Overlay duration" Style="{StaticResource Label}" />
-                                <Slider Grid.Column="1" Minimum="3" Maximum="30" SmallChange="1" LargeChange="1" TickFrequency="1" IsSnapToTickEnabled="True"
-                                        Value="{Binding OverlaySeconds}" Margin="16,0,0,0" />
-                                <TextBlock Grid.Column="2" Text="{Binding OverlaySecondsText}" Style="{StaticResource Value}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Detect other fullscreen games" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Steam, Epic and GOG games are always detected. This also catches fullscreen 3D apps from elsewhere." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding DetectFullscreenApps}" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                    <Border Style="{StaticResource CardBorder}">
-                        <StackPanel>
-                            <TextBlock Text="Connection" Style="{StaticResource CardTitle}" Margin="0,0,0,8" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="Hide Bluetooth controller (HidHide)" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Games then only see the virtual wired DualSense. Applies on the next connection." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding UseHidHide}" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="340" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="usbip.exe location" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Leave empty to find it automatically." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <TextBox Grid.Column="1" Text="{Binding UsbipPath, UpdateSourceTrigger=LostFocus}" Margin="16,0,8,0" VerticalAlignment="Center" />
-                                <Button Grid.Column="2" Content="Browse" Style="{StaticResource GhostButton}" Command="{Binding BrowseUsbip}" VerticalAlignment="Center" />
-                            </Grid>
-                            <Border Style="{StaticResource Divider}" />
-                            <Grid Style="{StaticResource Row}">
-                                <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="110" /></Grid.ColumnDefinitions>
-                                <StackPanel VerticalAlignment="Center">
-                                    <TextBlock Text="USB/IP port" Style="{StaticResource Label}" />
-                                    <TextBlock Text="Only change if another app uses 3240. Applies after restarting Zerk Sense 5." Style="{StaticResource Hint}" />
-                                </StackPanel>
-                                <TextBox Grid.Column="1" Text="{Binding UsbipPort, UpdateSourceTrigger=LostFocus}" VerticalAlignment="Center" />
-                            </Grid>
-                        </StackPanel>
-                    </Border>
-                </StackPanel>
-            </ScrollViewer>
-
-            <DockPanel Margin="36,30,36,24" Visibility="{Binding IsChecked, ElementName=NavLog, Converter={StaticResource Visible}}">
-                <StackPanel DockPanel.Dock="Top">
-                    <TextBlock Text="Activity log" Style="{StaticResource PageTitle}" />
-                    <TextBlock Text="What the bridge has been doing. Useful when something doesn't connect." Style="{StaticResource PageSubtitle}" />
-                </StackPanel>
-                <Border Style="{StaticResource CardBorder}" Padding="14,10" Margin="0">
-                    <ScrollViewer x:Name="LogScroll" VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding LogLines}">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Margin="0,2">
-                                        <TextBlock Text="{Binding Time}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="#5A6273" Width="70" />
-                                        <TextBlock Text="{Binding Tag}" FontFamily="Cascadia Mono, Consolas" FontSize="12" Foreground="{Binding TagBrush}" Width="44" />
-                                        <TextBlock Text="{Binding Message}" FontFamily="Cascadia Mono, Consolas" FontSize="12" TextWrapping="Wrap" />
-                                    </StackPanel>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </ScrollViewer>
-                </Border>
-            </DockPanel>
-        </Grid>
+                </DockPanel>
+            </Grid>
+        </DockPanel>
     </Grid>
 </Window>

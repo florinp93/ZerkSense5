@@ -102,10 +102,8 @@ static class Updater
         return best;
     }
 
-    public static async Task DownloadAndInstallAsync(UpdateInfo update, IProgress<string> status)
+    public static void Install(string newExe)
     {
-        string newExe = await DownloadAsync(update, status);
-        status.Report("Restarting");
         string installDir = AppContext.BaseDirectory.TrimEnd(Path.DirectorySeparatorChar);
         Process.Start(new ProcessStartInfo(newExe, $"--apply-update \"{installDir}\" {Environment.ProcessId}") { UseShellExecute = true });
     }
