@@ -14,6 +14,8 @@
   </a>
 </p>
 
+> **AI use.** Since v0.7.0-alpha.1, AI (Claude) is used for testing, such as writing the latency and jitter test, and for documentation. Everything it produces is reviewed by me before it goes public.
+
 Use a DualSense over plain Bluetooth on Windows and still get the features that normally need a USB cable: HD haptics, the controller speaker and microphone, and adaptive triggers in games that support them. On top of that it adds DualSense features to games that don't support the controller at all.
 
 The idea comes from [DS5Dongle](https://github.com/awalol/DS5Dongle), which does the wired-over-wireless part with a Raspberry Pi Pico. Zerk Sense 5 does it in software, with the PC's own Bluetooth.
