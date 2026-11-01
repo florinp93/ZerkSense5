@@ -1,4 +1,18 @@
-# Zerk Sense 5
+<p align="center">
+  <img src="docs/banner.png" alt="Zerk Sense 5: a Bluetooth DualSense on Windows, with everything the cable gives you" />
+</p>
+
+<p align="center">
+  <a href="https://github.com/florinp93/ZerkSense5/releases">
+    <img src="https://img.shields.io/github/v/release/florinp93/ZerkSense5?include_prereleases&style=for-the-badge&label=Latest%20release&color=3B82F6" alt="Latest release" />
+  </a>
+  <a href="https://ko-fi.com/zerkiller">
+    <img src="https://img.shields.io/badge/Ko--Fi-Buy%20me%20a%20coffee-FF5E5B?style=for-the-badge&logo=ko-fi&logoColor=white" alt="Ko-fi" />
+  </a>
+  <a href="https://github.com/florinp93">
+    <img src="https://img.shields.io/badge/Other-Projects-0AB4F5?style=for-the-badge&logo=github&logoColor=white" alt="Other Projects" />
+  </a>
+</p>
 
 Use a DualSense over plain Bluetooth on Windows and still get the features that normally need a USB cable: HD haptics, the controller speaker and microphone, and adaptive triggers in games that support them. On top of that it adds DualSense features to games that don't support the controller at all.
 
