@@ -2,6 +2,17 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.0-alpha.2] - 2026-11-01
+
+### Fixed
+- The controller speaker stayed silent when the DualSense was picked as the Windows output device. The speaker volume and mute state are now sent to the controller when audio starts.
+- Speaker audio cut out because it reached the controller in bursts. Audio reports are now buffered and sent on a steady clock.
+- The mic button did nothing. It now toggles the microphone mute and the mute light, and the virtual microphone sends silence while muted.
+- After a crash, or when running from a new folder, the app could not see a controller that HidHide was still hiding. The app now registers itself with HidHide at startup.
+
+### Added
+- `--speaker-test` diagnostic that plays a test tone through the controller speaker.
+
 ## [0.6.0-alpha.1] - 2026-10-31
 
 First public pre-release.
@@ -25,4 +36,5 @@ First public pre-release.
 - A DualSense Edge is presented as a regular DualSense.
 - Covers are shown for Steam games only.
 
+[0.6.0-alpha.2]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.2
 [0.6.0-alpha.1]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.1

@@ -13,7 +13,7 @@
     <AssemblyName>ZerkSense5</AssemblyName>
     <RootNamespace>ZerkSense5</RootNamespace>
     <Product>Zerk Sense 5</Product>
-    <Version>0.6.0-alpha.1</Version>
+    <Version>0.6.0-alpha.2</Version>
     <ServerGarbageCollection>false</ServerGarbageCollection>
     <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
     <TieredPGO>true</TieredPGO>
