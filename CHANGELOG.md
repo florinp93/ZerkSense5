@@ -2,7 +2,7 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [0.8.0-alpha.1] - 2026-11-11
 
 ### Added
 - Touchpad as mouse: one finger moves the pointer, two fingers scroll, and clicking or tapping the touchpad clicks. Set it globally on the Controls tab or per game.
@@ -76,6 +76,7 @@ First public pre-release.
 - A DualSense Edge is presented as a regular DualSense.
 - Covers are shown for Steam games only.
 
+[0.8.0-alpha.1]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.8.0-alpha.1
 [0.7.0-alpha.1]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.7.0-alpha.1
 [0.6.0-alpha.3]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.3
 [0.6.0-alpha.2]: https://github.com/florinp93/ZerkSense5/releases/tag/v0.6.0-alpha.2
