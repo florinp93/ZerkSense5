@@ -68,6 +68,9 @@ sealed class BridgeService : IDisposable
         _rumble.Changed += Triggers.OnRumble;
         _lighting = new LightingEngine(config, () => _bt, () => Controller, () => AudioHaptics.Level);
         Dsx = new DsxServer(config, Triggers, () => _bt, () => Controller, _lighting.NoteGameLightbar);
+        Input = new InputMapper(config, TurnOff);
+        Input.Changed += Raise;
+        _audio.GameHapticsStarted += OnGameHaptics;
         _thread = new Thread(Run) { IsBackground = true, Name = "Bridge" };
     }
 
@@ -78,6 +81,11 @@ sealed class BridgeService : IDisposable
     public AudioHaptics AudioHaptics { get; }
     public TriggerManager Triggers { get; }
     public DsxServer Dsx { get; }
+    public InputMapper Input { get; }
+
+    public bool GameLightbar => _lighting.GameOwnsLightbar;
+    public bool GameHaptics { get; private set; }
+    public bool GameTriggers => Triggers.GameOwns(0) || Triggers.GameOwns(1);
     public BridgeState State { get; private set; } = BridgeState.Starting;
     public ControllerMode ActiveMode { get; private set; } = ControllerMode.DualSense;
     public ControllerStatus? Controller { get; private set; }
@@ -113,6 +121,7 @@ sealed class BridgeService : IDisposable
 
     public void SetAudioHapticsTarget(int? pid)
     {
+        AudioHaptics.Suppressed = GameHaptics && Config.Now.Profile?.AudioHaptics != true;
         lock (_captureLock)
         {
             if (pid == _captureTarget && (_capture?.IsRunning ?? pid == null)) return;
@@ -144,6 +153,7 @@ sealed class BridgeService : IDisposable
 
     public void ApplyLightbar()
     {
+        if (_lighting.GameOwnsLightbar && Config.Now.Profile?.LightbarColor == null) return;
         var color = Config.Now.LightbarColor;
         _bt?.SendState(new StateData { AllowLedColor = true, LedRed = color[0], LedGreen = color[1], LedBlue = color[2] }.ToReport32());
     }
@@ -179,6 +189,46 @@ sealed class BridgeService : IDisposable
     }
 
     void Raise() => Changed?.Invoke();
+
+    public void ResetGameControl(bool keepNative = false)
+    {
+        bool had = GameHaptics || GameLightbar || GameTriggers;
+        GameHaptics = false;
+        AudioHaptics.Suppressed = false;
+        _audio.ResetGameHaptics();
+        _lighting.ReleaseGameLightbar();
+        if (keepNative) Triggers.Reset();
+        else Triggers.ReleaseGame();
+        if (had) Raise();
+    }
+
+    public void SetGameNativeTriggers(bool native)
+    {
+        if (Triggers.SetGameNative(native)) Raise();
+    }
+
+    void OnGameHaptics()
+    {
+        if (GameHaptics) return;
+        GameHaptics = true;
+        AudioHaptics.Suppressed = Config.Now.Profile?.AudioHaptics != true;
+        if (AudioHaptics.Suppressed && AudioHaptics.Enabled) Log.Info("The game sends its own haptics; audio haptics paused");
+        Raise();
+    }
+
+    void TurnOff(IController controller)
+    {
+        var pairing = controller.GetFeatureCached(0x09);
+        if (pairing is not { Length: >= 6 })
+        {
+            Log.Warn("Can't turn the controller off: its Bluetooth address is unknown");
+            return;
+        }
+        ulong address = 0;
+        for (int i = 5; i >= 0; i--) address = address << 8 | pairing[i];
+        Log.Info("Turning the controller off");
+        if (!BluetoothRadio.Disconnect(address)) Log.Warn("Windows refused to disconnect the controller");
+    }
 
     void Run()
     {
@@ -256,6 +306,7 @@ sealed class BridgeService : IDisposable
         }
 
         _bt = bt;
+        Input.Attach(bt);
         Controller = new ControllerStatus(bt.IsEdge, 0, PowerState.Discharging, false, false, false, 0);
         State = BridgeState.Connected;
         Log.Info($"Connected: DualSense{(bt.IsEdge ? " Edge" : "")} over Bluetooth");
@@ -296,6 +347,7 @@ sealed class BridgeService : IDisposable
         }
 
         Unplug(usbip);
+        Input.Detach();
         _bt = null;
         _audio.MicActive = false;
         _audio.ResetMic();
@@ -312,7 +364,7 @@ sealed class BridgeService : IDisposable
         IUsbDevice device;
         if (mode == ControllerMode.Xbox360)
         {
-            var x = new VirtualXbox360(bt);
+            var x = new VirtualXbox360(Input);
             x.Rumble += _rumble.Set;
             x.PlayerChanged += SetPlayerLeds;
             _xbox = x;
@@ -320,13 +372,13 @@ sealed class BridgeService : IDisposable
         }
         else
         {
-            var d = new VirtualDualSense(bt, _audio, Config, OnGameReport);
+            var d = new VirtualDualSense(Input, _audio, Config, OnGameReport);
             d.StreamsChanged += Raise;
             _device = d;
             device = d;
         }
         _server.Device = device;
-        Triggers.Reset();
+        ResetGameControl(keepNative: true);
         Triggers.Apply();
         if (usbip != null && usbip.Attach())
             Log.Info(mode == ControllerMode.Xbox360 ? "Virtual Xbox 360 controller plugged in" : "Virtual wired DualSense plugged in");
@@ -347,8 +399,28 @@ sealed class BridgeService : IDisposable
 
     void OnGameReport(StateData state)
     {
+        bool triggers = GameTriggers;
         Triggers.FilterGameReport(state);
-        if (state.AllowLedColor) _lighting.NoteGameLightbar();
+        if (state.AllowLedColor)
+        {
+            if (Config.Now.Profile?.LightbarColor is { } mine)
+            {
+                state.LedRed = mine[0];
+                state.LedGreen = mine[1];
+                state.LedBlue = mine[2];
+            }
+            else if (!_lighting.GameOwnsLightbar)
+            {
+                _lighting.NoteGameLightbar();
+                Log.Info("The game sets the lightbar itself; lighting effects paused");
+                Raise();
+            }
+        }
+        if (!triggers && GameTriggers)
+        {
+            Log.Info("The game sends its own trigger effects; global trigger effects paused");
+            Raise();
+        }
     }
 
     void SetPlayerLeds(int player)

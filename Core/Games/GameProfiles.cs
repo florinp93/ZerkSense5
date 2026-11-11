@@ -18,6 +18,8 @@ sealed class GameProfile
     public int? TriggerReduce { get; set; }
     public byte[]? LightbarColor { get; set; }
     public bool? AudioHaptics { get; set; }
+    public bool? TouchpadMouse { get; set; }
+    public bool? Bindings { get; set; }
 
     public bool? CustomTriggers { get; set; }
     public TriggerEffect? TriggerL { get; set; }
@@ -65,6 +67,10 @@ sealed class ActiveSettings(Config cfg)
     public float HapticsGain => Profile?.HapticsGain ?? cfg.HapticsGain;
     public int TriggerReduce => Profile?.TriggerReduce ?? cfg.TriggerReduce;
     public byte[] LightbarColor => Profile?.LightbarColor ?? cfg.LightbarColor;
+    public bool TouchpadMouse => Profile?.TouchpadMouse ?? cfg.TouchpadMouse;
+    public bool BindingsEnabled => Profile?.Bindings ?? true;
+
+    public bool GlobalTriggers => Profile?.CustomTriggers == null;
 
     public TriggerEffect? TriggerL => Profile?.CustomTriggers switch { true => Profile.TriggerL, false => null, _ => cfg.TriggerL };
     public TriggerEffect? TriggerR => Profile?.CustomTriggers switch { true => Profile.TriggerR, false => null, _ => cfg.TriggerR };

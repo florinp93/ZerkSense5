@@ -89,8 +89,19 @@ sealed class AudioBridge
         }
     }
 
+    volatile bool _gameHaptics;
+
+    public event Action? GameHapticsStarted;
+
+    public void ResetGameHaptics() => _gameHaptics = false;
+
     void OnHapticSample(float l, float r)
     {
+        if (!_gameHaptics && (Math.Abs(l) > 0.02f || Math.Abs(r) > 0.02f))
+        {
+            _gameHaptics = true;
+            GameHapticsStarted?.Invoke();
+        }
         float gain = _cfg.Now.HapticsGain;
         _hapticNative[_hapticPos] = l * gain;
         _hapticNative[_hapticPos + 1] = r * gain;

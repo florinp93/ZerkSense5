@@ -2,6 +2,24 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Touchpad as mouse: one finger moves the pointer, two fingers scroll, and clicking or tapping the touchpad clicks. Set it globally on the Controls tab or per game.
+- Button bindings: map a button, or several held together, to a key, a mouse button, the scroll wheel, turning the touchpad mouse on or off, or turning the controller off. Keys stay held as long as the buttons, so push-to-talk works. Bindings can be turned off per game.
+
+### Changed
+- Games that drive DualSense features themselves now take them over. Global trigger effects, lighting effects and haptics from game audio pause once the game sends its own, and come back when it closes. Settings made for a single game still win.
+- New tabs: Home, Games, Feedback and Controls. Feedback holds haptics, the Trigger Lab and the lightbar. Xbox 360 mode moved to Games; audio, Bluetooth streaming and DSX mods moved to Settings.
+- A game's profile is grouped into Mode, Feedback, Lightbar and Controls.
+- The window fits smaller sizes: rows wrap when space is short, and the Games list and details scroll separately.
+- Animations for tabs, pages, buttons, switches and scrolling. They follow the Windows "Animation effects" setting.
+- The Home page shows which features the running game controls.
+
+### Fixed
+- The mouse wheel got stuck on small lists instead of scrolling the page.
+- Long lines in the activity log were cut off.
+
 ## [0.7.0-alpha.1] - 2026-11-01
 
 ### Added

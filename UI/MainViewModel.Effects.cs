@@ -60,7 +60,8 @@ partial class MainViewModel
     public double AudioLevel => _service.AudioHaptics.Enabled ? Math.Min(1, _service.AudioHaptics.Level) * 240 : 0;
 
     public string AudioHapticsStatus =>
-        _service.AudioHaptics.Enabled && _games.Current is { } s ? $"Live from {s.Game.Name}"
+        _service.AudioHaptics.Enabled && _service.AudioHaptics.Suppressed ? "Paused: the game sends its own haptics"
+        : _service.AudioHaptics.Enabled && _games.Current is { } s ? $"Live from {s.Game.Name}"
         : _cfg.AudioHapticsMode == 0 ? "Off"
         : _games.Current != null ? "Not used for this game (it has native haptics)"
         : "Starts when a game runs";

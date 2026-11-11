@@ -160,6 +160,8 @@ sealed class TriggerManager
     readonly byte[][] _captured = new byte[2][];
     readonly TriggerEffect?[] _mod = new TriggerEffect?[2];
     bool[] _customApplied = new bool[2];
+    readonly bool[] _gameOwns = new bool[2];
+    volatile bool _gameNative;
     int _kickLevel;
     long _lastKick;
 
@@ -173,7 +175,30 @@ sealed class TriggerManager
 
     public byte[]? LastCaptured(int side) => _captured[side];
 
-    public TriggerEffect? Effective(int side) => _mod[side] ?? (side == 0 ? _cfg.Now.TriggerL : _cfg.Now.TriggerR);
+    public TriggerEffect? Effective(int side)
+    {
+        if (_mod[side] is { } mod) return mod;
+        if (_cfg.Now.GlobalTriggers && GameOwns(side)) return null;
+        return side == 0 ? _cfg.Now.TriggerL : _cfg.Now.TriggerR;
+    }
+
+    public bool GameOwns(int side) => _gameOwns[side] || _gameNative;
+
+    public bool SetGameNative(bool native)
+    {
+        if (_gameNative == native) return false;
+        _gameNative = native;
+        Apply();
+        return true;
+    }
+
+    public void ReleaseGame()
+    {
+        bool had = _gameOwns[0] || _gameOwns[1] || _gameNative;
+        _gameOwns[0] = _gameOwns[1] = false;
+        _gameNative = false;
+        if (had) Apply();
+    }
 
     public bool ModActive => _mod[0] != null || _mod[1] != null;
 
@@ -202,7 +227,7 @@ sealed class TriggerManager
         {
             var effect = Effective(side);
             if (effect != null) s.SetTrigger(side, effect.Encode());
-            else if (_customApplied[side]) s.SetTrigger(side, new TriggerEffect { Type = TriggerEffectType.Off }.Encode());
+            else if (_customApplied[side] && !GameOwns(side)) s.SetTrigger(side, new TriggerEffect { Type = TriggerEffectType.Off }.Encode());
             _customApplied[side] = effect != null;
         }
         if (s.AllowLeftTriggerFFB || s.AllowRightTriggerFFB) bt.SendState(s.ToReport31());
@@ -221,10 +246,16 @@ sealed class TriggerManager
         {
             if (!state.AllowTrigger(side)) continue;
             var bytes = state.GetTrigger(side);
-            if (bytes[0] is not (0x00 or 0x05) && (_captured[side] == null || !_captured[side].AsSpan().SequenceEqual(bytes)))
+            bool real = bytes[0] is not (0x00 or 0x05);
+            if (real && (_captured[side] == null || !_captured[side].AsSpan().SequenceEqual(bytes)))
             {
                 _captured[side] = bytes;
                 Captured?.Invoke(side, bytes);
+            }
+            if (real && !_gameOwns[side])
+            {
+                _gameOwns[side] = true;
+                _customApplied[side] = false;
             }
             if (Effective(side) != null) state.ClearTrigger(side);
         }
@@ -259,6 +290,7 @@ sealed class TriggerManager
     public void Reset()
     {
         _customApplied = new bool[2];
+        _gameOwns[0] = _gameOwns[1] = false;
         _kickLevel = 0;
     }
 }

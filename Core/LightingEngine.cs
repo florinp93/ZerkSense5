@@ -12,7 +12,7 @@ sealed class LightingEngine : IDisposable
     readonly Func<float> _audioLevel;
     readonly Timer _timer;
     readonly DateTime _start = DateTime.UtcNow;
-    long _gameLightbarUntil;
+    volatile bool _gameLightbar;
     (byte, byte, byte) _last = (1, 2, 3);
     float _smoothedAudio;
 
@@ -25,7 +25,16 @@ sealed class LightingEngine : IDisposable
         _timer = new Timer(_ => Tick(), null, IntervalMs, IntervalMs);
     }
 
-    public void NoteGameLightbar() => Interlocked.Exchange(ref _gameLightbarUntil, Environment.TickCount64 + 3000);
+    public bool GameOwnsLightbar => _gameLightbar;
+
+    public void NoteGameLightbar() => _gameLightbar = true;
+
+    public void ReleaseGameLightbar()
+    {
+        if (!_gameLightbar) return;
+        _gameLightbar = false;
+        Invalidate();
+    }
 
     public void Invalidate() => _last = (1, 2, 3);
 
@@ -34,7 +43,7 @@ sealed class LightingEngine : IDisposable
         var mode = (LightingMode)_cfg.LightingMode;
         var bt = _bt();
         if (bt == null || mode == LightingMode.Static) return;
-        if (Environment.TickCount64 < Interlocked.Read(ref _gameLightbarUntil)) return;
+        if (_gameLightbar) return;
 
         var c = Color(mode, (DateTime.UtcNow - _start).TotalSeconds);
         if (c == _last) return;

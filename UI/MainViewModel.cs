@@ -54,6 +54,7 @@ sealed partial class MainViewModel : INotifyPropertyChanged
         InitEffects();
         InitLibrary();
         InitUpdates();
+        InitControls();
         Refresh();
     }
 
@@ -76,6 +77,8 @@ sealed partial class MainViewModel : INotifyPropertyChanged
                      nameof(HidHideBrush), nameof(HeadsetText), nameof(RateText), nameof(StreamsText),
                      nameof(ShowUsbipMissing), nameof(ShowHidHideMissing), nameof(MicMutedText), nameof(DriversText), nameof(DsxText), nameof(DsxState),
                      nameof(MicMuted), nameof(ModeText), nameof(TriggerLText), nameof(TriggerRText),
+                     nameof(GameInControl), nameof(GameControlText), nameof(TouchpadMouseState), nameof(TouchpadMouseActive),
+                     nameof(LightingGameNote), nameof(HasLightingGameNote),
                  })
             Notify(p);
     }

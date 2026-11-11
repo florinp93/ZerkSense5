@@ -43,6 +43,12 @@ sealed class Config
     public bool DsxMods { get; set; } = true;
     public int DsxPort { get; set; } = 6969;
 
+    public bool TouchpadMouse { get; set; }
+    public int TouchpadSpeed { get; set; } = 5;
+    public bool TouchpadTapToClick { get; set; } = true;
+    public bool TouchpadRightClickZone { get; set; } = true;
+    public List<ButtonBinding> Bindings { get; set; } = new();
+
     public byte[] LightbarColor { get; set; } = [0xFF, 0xD7, 0x00];
     public int LightingMode { get; set; }
     public int LightingSpeed { get; set; } = 5;
@@ -119,6 +125,10 @@ sealed class Config
         if (TriggerKick is < 0 or > 2) TriggerKick = 0;
         SavedEffects ??= new();
         if (DsxPort is < 1024 or > 65535) DsxPort = 6969;
+
+        TouchpadSpeed = Math.Clamp(TouchpadSpeed, 1, 10);
+        Bindings = (Bindings ?? new()).Where(b => b != null).ToList();
+        foreach (var b in Bindings) b.Buttons = (b.Buttons ?? new()).Where(x => Enum.IsDefined(x)).Distinct().ToList();
 
         if (LightbarColor is not { Length: 3 }) LightbarColor = [0xFF, 0xD7, 0x00];
         if (LightingMode is < 0 or > 4) LightingMode = 0;

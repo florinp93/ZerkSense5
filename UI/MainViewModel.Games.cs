@@ -288,6 +288,7 @@ partial class MainViewModel
                      nameof(ProfileMode), nameof(OverrideHaptics), nameof(ProfileHaptics), nameof(ProfileHapticsText),
                      nameof(OverrideTriggers), nameof(ProfileTriggers), nameof(ProfileTriggersText), nameof(OverrideLightbar),
                      nameof(ProfileLightbarBrush), nameof(HasGames), nameof(ProfileAudioHaptics),
+                     nameof(ProfileTouchpadMouse), nameof(ProfileBindings), nameof(TouchpadMouseState),
                  })
             Notify(p);
         TriggerLab?.SelectedGameChanged();

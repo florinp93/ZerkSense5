@@ -116,6 +116,8 @@ sealed class GameManager : IDisposable
         profile.ExePath = game.ExePath;
         profile.LastPlayed = DateTime.Now;
         _cfg.Save();
+        _bridge.ResetGameControl();
+        _bridge.Input.ResetToggle();
         Apply(profile);
 
         var cached = profile.PcgwPage == PcgwClient.NoPage ? null : Pcgw.Cached(game.Key);
@@ -142,6 +144,8 @@ sealed class GameManager : IDisposable
         Log.Info($"Game closed: {game.Name}");
         Current = null;
         _bridge.Dsx.Reset();
+        _bridge.ResetGameControl();
+        _bridge.Input.ResetToggle();
         Apply(null);
         _bridge.SetMode(ControllerMode.DualSense);
         UpdateAudioHaptics();
@@ -256,7 +260,11 @@ sealed class GameManager : IDisposable
         _ => false,
     });
 
-    public void UpdateAudioHaptics() => _bridge.SetAudioHapticsTarget(AudioHapticsOn && Current!.Game.ProcessId > 0 ? Current.Game.ProcessId : null);
+    public void UpdateAudioHaptics()
+    {
+        _bridge.SetAudioHapticsTarget(AudioHapticsOn && Current!.Game.ProcessId > 0 ? Current.Game.ProcessId : null);
+        _bridge.SetGameNativeTriggers(Current is { } s && s.EffectiveMode == ControllerMode.DualSense && s.Pcgw?.AdaptiveTriggers == Support.Yes);
+    }
 
     public void Dispose() => _detector.Dispose();
 }

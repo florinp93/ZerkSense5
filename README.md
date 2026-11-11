@@ -41,7 +41,10 @@ For games without DualSense support it can plug in a virtual **Xbox 360 controll
 - **PCGamingWiki matching:** each game's DualSense support is looked up on [PCGamingWiki](https://www.pcgamingwiki.com). Games outside a launcher are matched using their installer entry, Steam or GOG files, folder name and window title, with release-style names cleaned up first. A wrong or missing match can be fixed by searching PCGamingWiki from the game's page.
 - **Overlay:** shows what the current game supports when it starts. Press Ctrl+Alt+Z to show it again.
 - **PlayStation button prompt mods:** when PCGamingWiki lists a mod that adds PlayStation prompts, the game's page shows the steps and links, and the overlay mentions it.
-- **Per-game profiles:** controller mode, haptics and trigger strength, lightbar colour, audio haptics and trigger effects.
+- **Per-game profiles:** controller mode, haptics and trigger strength, lightbar colour, audio haptics, trigger effects, touchpad mouse and bindings.
+- **Touchpad as mouse:** one finger moves the pointer, two fingers scroll, and clicking or tapping the touchpad clicks.
+- **Button bindings:** map buttons or button combos to keys, mouse buttons or actions, like PS for push-to-talk or a combo that turns the controller off.
+- **Games stay in charge:** when a game drives the triggers, lightbar or haptics itself, Zerk Sense 5 steps aside until it closes.
 - **Xbox 360 mode:** for games without DualSense support. Rumble plays as HD haptics or classic rumble, and the player number shows on the touchpad LEDs.
 - **Haptics from game audio:** the game's bass drives the grips in games without their own haptics. Only the game's audio is captured, not music or voice chat.
 - **Trigger Lab:** build trigger effects, record the effects a game sends and replay them in other games.
@@ -87,7 +90,7 @@ The virtual controller is plugged in when the DualSense connects and removed whe
 Many games get adaptive triggers and lighting from mods written for [DSX](https://github.com/Paliverse/DualSenseX). Those mods send their effects to DSX over a local connection. Zerk Sense 5 listens for the same messages, so the mods work without DSX.
 
 1. Close DSX if it's installed. Both apps use port 6969, and only one can listen on it.
-2. In Zerk Sense 5, check that **DSX mods** is on (Triggers page). It's on by default.
+2. In Zerk Sense 5, check that **DSX mods** is on (Settings, under Mods). It's on by default.
 3. Install the mod as its page describes, but skip installing or starting DSX.
 4. Start the game. The Home page shows **DSX mods: Active** once the mod connects.
 

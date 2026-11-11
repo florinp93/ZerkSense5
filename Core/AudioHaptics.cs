@@ -27,13 +27,15 @@ sealed class AudioHaptics : IHapticsSource
 
     public volatile bool Enabled;
 
+    public volatile bool Suppressed;
+
     public float Level { get; private set; }
 
     public bool Active
     {
         get
         {
-            if (!Enabled) return false;
+            if (!Enabled || Suppressed) return false;
             lock (_lock) return _count > 0;
         }
     }

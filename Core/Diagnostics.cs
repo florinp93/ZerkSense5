@@ -493,11 +493,57 @@ static class Diagnostics
         Check(capturedR is { } cr && cr[0] == 0x25 && gameState.AllowRightTriggerFFB, "Game trigger effect is captured and passed through");
         triggerCfg.TriggerR = new TriggerEffect { Type = TriggerEffectType.Resistance, Start = 0, Strength = 8 };
         triggers.FilterGameReport(gameState);
-        Check(!gameState.AllowRightTriggerFFB, "Custom R2 effect blocks the game's R2 effect");
+        Check(gameState.AllowRightTriggerFFB && triggers.GameOwns(1) && triggers.Effective(1) == null,
+            "Global R2 effect steps aside once the game sends its own");
+
+        var fresh = new TriggerManager(triggerCfg, () => triggerMock);
         while (triggerMock.States.TryDequeue(out _)) { }
-        triggers.Apply();
+        fresh.Apply();
         Check(triggerMock.States.TryDequeue(out var applied) && applied[0] == 0x31 && (applied[3] & 0x04) != 0 && applied[3 + 10] == 0x21,
-            "Custom effect is sent in a 0x31 report");
+            "Global effect is sent in a 0x31 report while the game has none");
+        var offState = new StateData();
+        offState.SetTrigger(1, new TriggerEffect { Type = TriggerEffectType.Off }.Encode());
+        fresh.FilterGameReport(offState);
+        Check(!offState.AllowRightTriggerFFB && !fresh.GameOwns(1), "A game that only turns triggers off doesn't take them over");
+
+        triggerCfg.Now.Profile = new GameProfile { CustomTriggers = true, TriggerR = new TriggerEffect { Type = TriggerEffectType.Resistance, Start = 0, Strength = 8 } };
+        var gameState2 = new StateData();
+        gameState2.SetTrigger(1, new TriggerEffect { Type = TriggerEffectType.Weapon, Start = 3, End = 6, Strength = 6 }.Encode());
+        triggers.FilterGameReport(gameState2);
+        Check(!gameState2.AllowRightTriggerFFB, "A per-game custom R2 effect still beats the game's own");
+        triggerCfg.Now.Profile = null;
+
+        while (triggerMock.States.TryDequeue(out _)) { }
+        triggers.ReleaseGame();
+        Check(!triggers.GameOwns(1) && triggerMock.States.TryDequeue(out var restored) && restored[3 + 10] == 0x21,
+            "Global effect returns when the game closes");
+        Check(fresh.SetGameNative(true) && fresh.Effective(1) == null, "Games known to use adaptive triggers keep them from the start");
+
+        var padCfg = new Config();
+        var pad = new TestPad();
+        var mapper = new InputMapper(padCfg, _ => { });
+        mapper.Attach(pad);
+        byte[]? seen = null;
+        mapper.InputReport += (b, n) => seen = b[..n];
+        var report = new byte[78];
+        report[0] = 0x31;
+        report[2 + 7] = 0x08 | 0x20;
+        report[2 + 9] = 0x01;
+        pad.Push(report);
+        Check(seen != null && seen.AsSpan().SequenceEqual(report), "No bindings: input passes through unchanged");
+        padCfg.Bindings = [new ButtonBinding { Buttons = [PadButton.PS], Action = BindingAction.Nothing }];
+        pad.Push(report);
+        Check(seen != null && (seen[2 + 9] & 0x01) == 0 && (seen[2 + 7] & 0x20) != 0, "A bound PS button is hidden from the game, other buttons pass");
+        report[2 + 7] = 0x01 | 0x20;
+        padCfg.Bindings = [new ButtonBinding { Buttons = [PadButton.Up], Action = BindingAction.Nothing }];
+        pad.Push(report);
+        Check(seen != null && (seen[2 + 7] & 0x0F) == 2 && (seen[2 + 7] & 0x20) != 0, "Hiding D-pad up turns up-right into right");
+        padCfg.Bindings = [new ButtonBinding { Buttons = [PadButton.L1, PadButton.R1], Action = BindingAction.Nothing, PassThrough = true }];
+        report[2 + 8] = 0x01 | 0x02;
+        pad.Push(report);
+        Check(seen != null && (seen[2 + 8] & 0x03) == 0x03, "A pass-through chord leaves the buttons to the game");
+        padCfg.Bindings = new();
+        mapper.Detach();
 
         var ahCfg = new Config();
         var ahAudio = new AudioBridge(ahCfg, () => null);
@@ -731,6 +777,17 @@ static class Diagnostics
         }
 
         public void Dispose() => _c.Close();
+    }
+
+    sealed class TestPad : IController
+    {
+        public event Action<byte[], int>? InputReport;
+        public void Push(byte[] report) => InputReport?.Invoke(report, report.Length);
+        public byte[]? GetFeatureLive(byte id) => null;
+        public byte[]? GetFeatureCached(byte id) => null;
+        public bool SetFeature(byte id, ReadOnlySpan<byte> body) => false;
+        public void SendState(byte[] report) { }
+        public void SendAudio(byte[] report) { }
     }
 
     sealed class MockController : IController

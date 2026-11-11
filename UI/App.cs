@@ -31,6 +31,7 @@ sealed class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+        Motion.InstallScrolling();
         if (await OfferUpdateAsync())
         {
             Shutdown();
