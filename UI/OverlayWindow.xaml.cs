@@ -148,6 +148,7 @@ sealed class OverlayModel
             rows.Add(new FeatureRow(cfg.RumbleStyle == 0 ? "Rumble as HD haptics" : "Rumble (classic)", Support.Yes, "Zerk Sense 5"));
             rows.Add(new FeatureRow("Player LEDs", Support.Yes, "Zerk Sense 5"));
             rows.Add(new FeatureRow("Adaptive triggers", Support.No, "Not in Xbox mode"));
+            if (cfg.Now.GyroMode != GyroMode.Off) rows.Add(new FeatureRow("Gyro aiming", Support.Yes, "Zerk Sense 5"));
         }
         else if (p != null)
         {
@@ -155,7 +156,9 @@ sealed class OverlayModel
             rows.Add(new FeatureRow("Adaptive triggers", p.AdaptiveTriggers));
             rows.Add(new FeatureRow("Lightbar", p.LightBar));
             rows.Add(new FeatureRow("Controller speaker", p.Speaker));
-            rows.Add(new FeatureRow("Motion sensors", p.Motion));
+            rows.Add(p.Motion == Support.Yes ? new FeatureRow("Gyro", Support.Yes, "Native gyro")
+                : cfg.Now.GyroMode != GyroMode.Off ? new FeatureRow("Gyro aiming", Support.Yes, "Zerk Sense 5")
+                : new FeatureRow("Gyro", p.Motion));
             rows.Add(new FeatureRow("PlayStation prompts", p.PlayStationPrompts,
                 p.PromptMod != null && p.PlayStationPrompts != Support.Yes ? "Mod available" : null));
         }

@@ -709,6 +709,35 @@
                                         <Grid Style="{StaticResource Row}">
                                             <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                             <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Gyro aiming" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Override the Controls page setting for this game." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                                <StackPanel Orientation="Horizontal">
+                                                    <RadioButton GroupName="pgy" Style="{StaticResource Segment}" Content="Global" IsChecked="{Binding ProfileGyroMode, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                                    <RadioButton GroupName="pgy" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding ProfileGyroMode, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                                    <RadioButton GroupName="pgy" Style="{StaticResource Segment}" Content="Mouse" IsChecked="{Binding ProfileGyroMode, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                                    <RadioButton GroupName="pgy" Style="{StaticResource Segment}" Content="Right stick" IsChecked="{Binding ProfileGyroMode, Converter={StaticResource Option}, ConverterParameter=3}" />
+                                                </StackPanel>
+                                            </Border>
+                                        </Grid>
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
+                                                <TextBlock Text="Custom gyro sensitivity" Style="{StaticResource Label}" />
+                                                <TextBlock Text="Games differ in mouse sensitivity, so this is often worth setting per game." Style="{StaticResource Hint}" />
+                                            </StackPanel>
+                                            <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding OverrideGyroSensitivity}" />
+                                        </Grid>
+                                        <Grid Style="{StaticResource Row}" Visibility="{Binding OverrideGyroSensitivity, Converter={StaticResource Visible}}" ui:Motion.Reveal="True">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <Slider Minimum="1" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding ProfileGyroSensitivity}" />
+                                            <TextBlock Grid.Column="1" Text="{Binding ProfileGyroSensitivityText}" Style="{StaticResource Value}" />
+                                        </Grid>
+                                        <Border Style="{StaticResource Divider}" />
+                                        <Grid Style="{StaticResource Row}">
+                                            <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                            <StackPanel VerticalAlignment="Center">
                                                 <TextBlock Text="Button bindings" Style="{StaticResource Label}" />
                                                 <TextBlock Text="The bindings from the Controls page." Style="{StaticResource Hint}" />
                                             </StackPanel>
@@ -1056,7 +1085,7 @@
                 <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding IsChecked, ElementName=NavControls, Converter={StaticResource Visible}}">
                     <StackPanel Margin="36,30,36,24" MaxWidth="900" ui:Motion.Stagger="True">
                         <TextBlock Text="Controls" Style="{StaticResource PageTitle}" />
-                        <TextBlock Text="Use the touchpad as a mouse, and turn buttons into keys, clicks and actions. Works in DualSense and Xbox 360 mode." Style="{StaticResource PageSubtitle}" />
+                        <TextBlock Text="Use the touchpad as a mouse, aim with the gyro, and turn buttons into keys, clicks and actions. Works in DualSense and Xbox 360 mode." Style="{StaticResource PageSubtitle}" />
 
                         <Border Style="{StaticResource CardBorder}">
                             <StackPanel>
@@ -1096,6 +1125,99 @@
                                     </StackPanel>
                                     <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding TouchpadRightClickZone}" />
                                 </Grid>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource CardBorder}">
+                            <StackPanel>
+                                <Grid Style="{StaticResource Row}">
+                                    <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                    <StackPanel VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="Gyro aiming" Style="{StaticResource CardTitle}" />
+                                            <Border Style="{StaticResource Pill}" Margin="10,0,0,0" VerticalAlignment="Center" Visibility="{Binding GyroEngaged, Converter={StaticResource Visible}}">
+                                                <TextBlock Text="Aiming" FontSize="12" />
+                                            </Border>
+                                        </StackPanel>
+                                        <TextBlock Text="Turn and tilt the controller to aim. Mouse works in any game that takes a mouse; right stick works in any game that takes a controller." Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                                        <TextBlock Text="{Binding GyroState}" Style="{StaticResource Hint}" Foreground="{StaticResource AccentLight}" Margin="0,2,0,0" />
+                                    </StackPanel>
+                                    <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                        <StackPanel Orientation="Horizontal">
+                                            <RadioButton GroupName="gyro" Style="{StaticResource Segment}" Content="Off" IsChecked="{Binding GyroModeIndex, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                            <RadioButton GroupName="gyro" Style="{StaticResource Segment}" Content="Mouse" IsChecked="{Binding GyroModeIndex, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                            <RadioButton GroupName="gyro" Style="{StaticResource Segment}" Content="Right stick" IsChecked="{Binding GyroModeIndex, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                        </StackPanel>
+                                    </Border>
+                                </Grid>
+                                <StackPanel Visibility="{Binding GyroOn, Converter={StaticResource Visible}}" ui:Motion.Reveal="True">
+                                    <Border Style="{StaticResource Divider}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="When it aims" Style="{StaticResource Label}" />
+                                            <TextBlock Text="Pausing lets you re-centre the controller without moving the camera." Style="{StaticResource Hint}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <RadioButton GroupName="gyroact" Style="{StaticResource Segment}" Content="Always" IsChecked="{Binding GyroActivationIndex, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                                <RadioButton GroupName="gyroact" Style="{StaticResource Segment}" Content="Hold to aim" IsChecked="{Binding GyroActivationIndex, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                                <RadioButton GroupName="gyroact" Style="{StaticResource Segment}" Content="Hold to pause" IsChecked="{Binding GyroActivationIndex, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                                <RadioButton GroupName="gyroact" Style="{StaticResource Segment}" Content="Toggle" IsChecked="{Binding GyroActivationIndex, Converter={StaticResource Option}, ConverterParameter=3}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                    <Grid Style="{StaticResource Row}" Visibility="{Binding GyroNeedsButton, Converter={StaticResource Visible}}" ui:Motion.Reveal="True">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Button" Style="{StaticResource Label}" />
+                                            <TextBlock Text="The game still gets the button." Style="{StaticResource Hint}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <RadioButton GroupName="gyrobtn" Style="{StaticResource Segment}" Content="L2" IsChecked="{Binding GyroButtonIndex, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                                <RadioButton GroupName="gyrobtn" Style="{StaticResource Segment}" Content="L1" IsChecked="{Binding GyroButtonIndex, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                                <RadioButton GroupName="gyrobtn" Style="{StaticResource Segment}" Content="R1" IsChecked="{Binding GyroButtonIndex, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                                <RadioButton GroupName="gyrobtn" Style="{StaticResource Segment}" Content="L3" IsChecked="{Binding GyroButtonIndex, Converter={StaticResource Option}, ConverterParameter=3}" />
+                                                <RadioButton GroupName="gyrobtn" Style="{StaticResource Segment}" Content="R3" IsChecked="{Binding GyroButtonIndex, Converter={StaticResource Option}, ConverterParameter=4}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                    <Border Style="{StaticResource Divider}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="260" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Sensitivity" Style="{StaticResource Label}" />
+                                            <TextBlock Text="{Binding GyroSensitivityHint}" Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                                        </StackPanel>
+                                        <Slider Grid.Column="1" Minimum="1" Maximum="50" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding GyroSensitivity}" Margin="16,0,0,0" />
+                                        <TextBlock Grid.Column="2" Text="{Binding GyroSensitivityText}" Style="{StaticResource Value}" />
+                                    </Grid>
+                                    <Border Style="{StaticResource Divider}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Left and right" Style="{StaticResource Label}" />
+                                            <TextBlock Text="Turn the controller like a steering wheel lying flat, tilt it sideways, or both." Style="{StaticResource Hint}" />
+                                        </StackPanel>
+                                        <Border Grid.Column="1" Style="{StaticResource SegmentHost}" Margin="16,0,0,0">
+                                            <StackPanel Orientation="Horizontal">
+                                                <RadioButton GroupName="gyroaxis" Style="{StaticResource Segment}" Content="Turn" IsChecked="{Binding GyroAxisIndex, Converter={StaticResource Option}, ConverterParameter=0}" />
+                                                <RadioButton GroupName="gyroaxis" Style="{StaticResource Segment}" Content="Tilt" IsChecked="{Binding GyroAxisIndex, Converter={StaticResource Option}, ConverterParameter=1}" />
+                                                <RadioButton GroupName="gyroaxis" Style="{StaticResource Segment}" Content="Both" IsChecked="{Binding GyroAxisIndex, Converter={StaticResource Option}, ConverterParameter=2}" />
+                                            </StackPanel>
+                                        </Border>
+                                    </Grid>
+                                    <Border Style="{StaticResource Divider}" />
+                                    <Grid Style="{StaticResource Row}">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="Invert up and down" Style="{StaticResource Label}" />
+                                            <TextBlock Text="Tilting the controller up looks down." Style="{StaticResource Hint}" />
+                                        </StackPanel>
+                                        <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding GyroInvertY}" />
+                                    </Grid>
+                                </StackPanel>
                             </StackPanel>
                         </Border>
 

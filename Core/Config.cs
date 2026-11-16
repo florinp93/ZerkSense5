@@ -49,6 +49,13 @@ sealed class Config
     public bool TouchpadRightClickZone { get; set; } = true;
     public List<ButtonBinding> Bindings { get; set; } = new();
 
+    public GyroMode GyroMode { get; set; }
+    public GyroActivation GyroActivation { get; set; } = GyroActivation.HoldToAim;
+    public PadButton GyroButton { get; set; } = PadButton.L2;
+    public GyroAxis GyroAxis { get; set; }
+    public int GyroSensitivity { get; set; } = 15;
+    public bool GyroInvertY { get; set; }
+
     public byte[] LightbarColor { get; set; } = [0xFF, 0xD7, 0x00];
     public int LightingMode { get; set; }
     public int LightingSpeed { get; set; } = 5;
@@ -129,6 +136,11 @@ sealed class Config
         TouchpadSpeed = Math.Clamp(TouchpadSpeed, 1, 10);
         Bindings = (Bindings ?? new()).Where(b => b != null).ToList();
         foreach (var b in Bindings) b.Buttons = (b.Buttons ?? new()).Where(x => Enum.IsDefined(x)).Distinct().ToList();
+        if (!Enum.IsDefined(GyroMode)) GyroMode = GyroMode.Off;
+        if (!Enum.IsDefined(GyroActivation)) GyroActivation = GyroActivation.HoldToAim;
+        if (!Enum.IsDefined(GyroButton)) GyroButton = PadButton.L2;
+        if (!Enum.IsDefined(GyroAxis)) GyroAxis = GyroAxis.Yaw;
+        GyroSensitivity = Math.Clamp(GyroSensitivity, 1, 50);
 
         if (LightbarColor is not { Length: 3 }) LightbarColor = [0xFF, 0xD7, 0x00];
         if (LightingMode is < 0 or > 4) LightingMode = 0;

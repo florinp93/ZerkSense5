@@ -289,6 +289,8 @@ partial class MainViewModel
                      nameof(OverrideTriggers), nameof(ProfileTriggers), nameof(ProfileTriggersText), nameof(OverrideLightbar),
                      nameof(ProfileLightbarBrush), nameof(HasGames), nameof(ProfileAudioHaptics),
                      nameof(ProfileTouchpadMouse), nameof(ProfileBindings), nameof(TouchpadMouseState),
+                     nameof(ProfileGyroMode), nameof(OverrideGyroSensitivity), nameof(ProfileGyroSensitivity),
+                     nameof(ProfileGyroSensitivityText), nameof(GyroState),
                  })
             Notify(p);
         TriggerLab?.SelectedGameChanged();
@@ -420,7 +422,7 @@ partial class MainViewModel
                 new FeatureRow("Adaptive triggers", p.AdaptiveTriggers),
                 new FeatureRow("Lightbar", p.LightBar),
                 new FeatureRow("Controller speaker", p.Speaker),
-                new FeatureRow("Motion sensors", p.Motion),
+                new FeatureRow("Gyro", p.Motion, p.Motion == Support.Yes ? "Native gyro" : null),
                 new FeatureRow("PlayStation prompts", p.PlayStationPrompts, p.PromptMod != null && p.PlayStationPrompts != Support.Yes ? "Mod available" : null),
                 new FeatureRow("Xbox controllers", p.XInput),
                 new FeatureRow("Connection", p.ConnectionModes.Length > 0 ? Support.Yes : Support.Unknown,

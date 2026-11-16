@@ -640,8 +640,121 @@ static class Diagnostics
         Check(ordered && SemVersion.Parse("v0.6.0-alpha.1")!.ToString() == "0.6.0-alpha.1", "Update versions compare by SemVer rules");
         Check(Updater.Current > new SemVersion(0, 0, 0, []), $"Build reports its version ({Updater.Current})");
 
+        GyroTests(cfg, Check);
+
         Log.Info(failures == 0 ? "Self-test passed" : $"Self-test: {failures} failure(s)");
         return failures == 0 ? 0 : 1;
+    }
+
+    static void GyroTests(Config cfg, Action<bool, string> check)
+    {
+        const double LsbPerDeg = 16.384;
+        uint stamp = 1000;
+        byte[] Report(double pitch, double yaw, double roll, bool l2 = false, byte rx = 0x80, byte ry = 0x80)
+        {
+            var s = new byte[63];
+            s[0] = s[1] = 0x80;
+            s[2] = rx;
+            s[3] = ry;
+            s[7] = 0x08;
+            if (l2) s[8] |= 0x04;
+            BinaryPrimitives.WriteInt16LittleEndian(s.AsSpan(15), (short)Math.Round(pitch * LsbPerDeg));
+            BinaryPrimitives.WriteInt16LittleEndian(s.AsSpan(17), (short)Math.Round(yaw * LsbPerDeg));
+            BinaryPrimitives.WriteInt16LittleEndian(s.AsSpan(19), (short)Math.Round(roll * LsbPerDeg));
+            BinaryPrimitives.WriteInt16LittleEndian(s.AsSpan(25), 8192);
+            stamp += 12000;
+            BinaryPrimitives.WriteUInt32LittleEndian(s.AsSpan(27), stamp);
+            return s;
+        }
+
+        var g = new Config { GyroMode = GyroMode.Mouse, GyroActivation = GyroActivation.Always, GyroSensitivity = 15 };
+        int mx = 0, my = 0;
+        var gyro = new GyroAim(g, (x, y) => { mx += x; my += y; });
+        for (int i = 0; i < 101; i++) gyro.Process(Report(0, -90, 0), 0, null);
+        check(Math.Abs(mx - 540) <= 6 && my == 0, $"Gyro mouse: turning right 90°/s for 0.4 s moves right 540 counts ({mx}, {my})");
+
+        mx = my = 0;
+        for (int i = 0; i < 51; i++) gyro.Process(Report(45, 0, 0), 0, null);
+        check(my < -130 && Math.Abs(mx) <= 1, $"Gyro mouse: tilting up moves the pointer up ({mx}, {my})");
+
+        g.GyroAxis = GyroAxis.Roll;
+        mx = my = 0;
+        for (int i = 0; i < 51; i++) gyro.Process(Report(0, 0, -45), 0, null);
+        check(mx > 130, $"Gyro mouse: tilt axis turns right on a right roll ({mx})");
+        g.GyroAxis = GyroAxis.Yaw;
+
+        mx = my = 0;
+        for (int i = 0; i < 51; i++) gyro.Process(Report(0, 0.5, 0), 0, null);
+        check(mx == 0 && my == 0, "Gyro mouse: tiny jitter below the smoothing threshold is suppressed");
+
+        g.GyroActivation = GyroActivation.HoldToAim;
+        mx = 0;
+        for (int i = 0; i < 26; i++) gyro.Process(Report(0, -90, 0), 0, null);
+        int idle = mx;
+        for (int i = 0; i < 26; i++) gyro.Process(Report(0, -90, 0, l2: true), Pad.Mask([PadButton.L2]), null);
+        check(idle == 0 && mx > 100 && gyro.Engaged, $"Gyro hold to aim: only moves while L2 is held ({idle} then {mx})");
+
+        g.GyroActivation = GyroActivation.Always;
+        var drift = new GyroAim(g, (x, y) => { mx += x; my += y; });
+        for (int i = 0; i < 1500; i++) drift.Process(Report(0, 1.2, 0), 0, null);
+        mx = my = 0;
+        for (int i = 0; i < 250; i++) drift.Process(Report(0, 1.2, 0), 0, null);
+        check(mx == 0, $"Gyro drift: a still controller's bias is learned and stops creeping ({mx} counts in 1 s)");
+
+        g.GyroMode = GyroMode.Stick;
+        var stick = new GyroAim(g);
+        var r = Report(0, 0, 0);
+        stick.Process(r, 0, null);
+        r = Report(20, -20, 0);
+        bool changed = stick.Process(r, 0, null);
+        check(changed && r[2] > 128 + 18 && r[3] < 128 - 18, $"Gyro stick: turning right and up pushes the right stick right and up (rx={r[2]}, ry={r[3]})");
+        r = Report(0, -400, 0, rx: 0xFF);
+        stick.Process(r, 0, null);
+        check(r[2] == 255, "Gyro stick: added to the real stick and clamped");
+
+        g.GyroMode = GyroMode.Off;
+        r = Report(0, -400, 0);
+        check(!stick.Process(r, 0, null) && r[2] == 0x80, "Gyro off leaves the report alone");
+
+        var calib = new byte[40];
+        BinaryPrimitives.WriteInt16LittleEndian(calib.AsSpan(2), 10);
+        foreach (var (o, v) in new[] { (6, 8800), (8, -8800), (10, 8800), (12, -8800), (14, 8800), (16, -8800), (18, 540), (20, 540) })
+            BinaryPrimitives.WriteInt16LittleEndian(calib.AsSpan(o), (short)v);
+        g.GyroMode = GyroMode.Mouse;
+        mx = 0;
+        var calibrated = new GyroAim(g, (x, y) => mx += x);
+        calibrated.Reset(new CalibPad(calib));
+        for (int i = 0; i < 101; i++)
+        {
+            var s = Report(0, 0, 0);
+            BinaryPrimitives.WriteInt16LittleEndian(s.AsSpan(17), (short)(10 - Math.Round(90 * 17600 / 1080.0)));
+            calibrated.Process(s, 0, null);
+        }
+        check(calibrated.Calibrated && Math.Abs(mx - 540) <= 6, $"Gyro uses the controller's calibration report ({mx})");
+
+        var native = new Config { GyroMode = GyroMode.Mouse };
+        native.Now.Profile = new GameProfile { Name = "Native" };
+        native.Now.NativeGyro = true;
+        check(native.Now.GyroMode == GyroMode.Off, "Gyro stays off in a game with its own gyro support");
+        native.Now.Profile.GyroMode = GyroMode.Stick;
+        check(native.Now.GyroMode == GyroMode.Stick, "A game profile's gyro choice still wins over native support");
+        native.Now.NativeGyro = false;
+        native.Now.Profile.GyroMode = null;
+        check(native.Now.GyroMode == GyroMode.Mouse, "Gyro follows the Controls page in games without their own gyro");
+
+        var motion = new PcgwInfo { Fields = { ["playstation controller models"] = "DS", ["playstation motion sensors"] = "true" } };
+        var verdict = Verdict.For(motion);
+        check(verdict.Recommended == ControllerMode.DualSense && verdict.Summary.Contains("gyro"), $"Native-gyro DualSense games get DualSense mode ({verdict.Summary})");
+    }
+
+    sealed class CalibPad(byte[] calib) : IController
+    {
+        public event Action<byte[], int>? InputReport { add { } remove { } }
+        public byte[]? GetFeatureLive(byte id) => id == 0x05 ? calib : null;
+        public byte[]? GetFeatureCached(byte id) => GetFeatureLive(id);
+        public bool SetFeature(byte id, ReadOnlySpan<byte> body) => false;
+        public void SendState(byte[] report) { }
+        public void SendAudio(byte[] report) { }
     }
 
     sealed class TestClient : IDisposable

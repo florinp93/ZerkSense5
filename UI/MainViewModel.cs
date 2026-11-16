@@ -78,7 +78,7 @@ sealed partial class MainViewModel : INotifyPropertyChanged
                      nameof(ShowUsbipMissing), nameof(ShowHidHideMissing), nameof(MicMutedText), nameof(DriversText), nameof(DsxText), nameof(DsxState),
                      nameof(MicMuted), nameof(ModeText), nameof(TriggerLText), nameof(TriggerRText),
                      nameof(GameInControl), nameof(GameControlText), nameof(TouchpadMouseState), nameof(TouchpadMouseActive),
-                     nameof(LightingGameNote), nameof(HasLightingGameNote),
+                     nameof(LightingGameNote), nameof(HasLightingGameNote), nameof(GyroEngaged), nameof(GyroState),
                  })
             Notify(p);
     }

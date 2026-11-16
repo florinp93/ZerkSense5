@@ -264,6 +264,12 @@ sealed class GameManager : IDisposable
     {
         _bridge.SetAudioHapticsTarget(AudioHapticsOn && Current!.Game.ProcessId > 0 ? Current.Game.ProcessId : null);
         _bridge.SetGameNativeTriggers(Current is { } s && s.EffectiveMode == ControllerMode.DualSense && s.Pcgw?.AdaptiveTriggers == Support.Yes);
+        bool nativeGyro = Current is { } g && g.EffectiveMode == ControllerMode.DualSense && g.Pcgw?.Motion == Support.Yes;
+        if (_cfg.Now.NativeGyro != nativeGyro)
+        {
+            _cfg.Now.NativeGyro = nativeGyro;
+            if (nativeGyro) Log.Info($"{Current!.Game.Name} has its own gyro support; Zerk Sense 5's gyro aiming stays off");
+        }
     }
 
     public void Dispose() => _detector.Dispose();

@@ -172,6 +172,7 @@ sealed class InputMapper : IController
     readonly byte[] _out = new byte[DualSenseBt.BtInputLength];
     readonly Dictionary<ButtonBinding, ButtonBinding> _active = new(ReferenceEqualityComparer.Instance);
     readonly object _lock = new();
+    readonly GyroAim _gyro;
     volatile IController? _bt;
     volatile bool _touchToggled;
 
@@ -187,7 +188,10 @@ sealed class InputMapper : IController
     {
         _cfg = cfg;
         _turnOff = turnOff;
+        _gyro = new GyroAim(cfg);
     }
+
+    public bool GyroEngaged => _gyro.Engaged;
 
     public event Action<byte[], int>? InputReport;
     public event Action? Changed;
@@ -197,6 +201,7 @@ sealed class InputMapper : IController
     public void Attach(IController bt)
     {
         _bt = bt;
+        lock (_lock) _gyro.Reset(bt);
         bt.InputReport += OnInput;
     }
 
@@ -204,7 +209,11 @@ sealed class InputMapper : IController
     {
         if (_bt is { } bt) bt.InputReport -= OnInput;
         _bt = null;
-        lock (_lock) ReleaseAll();
+        lock (_lock)
+        {
+            ReleaseAll();
+            _gyro.Reset(null);
+        }
     }
 
     public void ResetToggle()
@@ -230,9 +239,10 @@ sealed class InputMapper : IController
 
         List<ButtonBinding> bindings = _cfg.Now.BindingsEnabled ? _cfg.Bindings : NoBindings;
         bool pad = TouchpadMouseOn;
+        bool gyro = _cfg.Now.GyroMode != GyroMode.Off || _gyro.Engaged;
         lock (_lock)
         {
-            if (bindings.Count == 0 && !pad && _active.Count == 0 && !_wasPadMouse)
+            if (bindings.Count == 0 && !pad && !gyro && _active.Count == 0 && !_wasPadMouse)
             {
                 InputReport?.Invoke(buf, len);
                 return;
@@ -242,6 +252,9 @@ sealed class InputMapper : IController
             Buffer.BlockCopy(buf, 0, _out, 0, n);
             var s = _out.AsSpan(2, 63);
             uint held = Pad.Read(s);
+            bool wasEngaged = _gyro.Engaged;
+            if (gyro) _gyro.Process(s, held, _bt);
+            if (_gyro.Engaged != wasEngaged) Changed?.Invoke();
             uint consumed = Bindings(bindings, held);
 
             if (pad) Touchpad(s);

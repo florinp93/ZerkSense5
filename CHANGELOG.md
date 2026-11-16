@@ -4,6 +4,12 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ## [Unreleased]
 
+### Added
+- Gyro aiming: turn and tilt the controller to aim, as mouse movement or added to the right stick. It can aim always, while a button is held, until a button pauses it, or on a toggle. It uses the controller's own calibration and corrects drift while the controller lies still. Mode and sensitivity can be set per game. Games that PCGamingWiki lists with their own gyro support keep the gyro to themselves: they run in DualSense mode and Zerk Sense 5's gyro aiming stays off, unless the game's profile says otherwise.
+
+### Changed
+- The game page and overlay show gyro support as "Native gyro", or "Gyro aiming" when Zerk Sense 5 adds it.
+
 ### Fixed
 - HidHide showed as "not installed" when it was installed to a folder other than the default one.
 

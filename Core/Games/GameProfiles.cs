@@ -20,6 +20,8 @@ sealed class GameProfile
     public bool? AudioHaptics { get; set; }
     public bool? TouchpadMouse { get; set; }
     public bool? Bindings { get; set; }
+    public GyroMode? GyroMode { get; set; }
+    public int? GyroSensitivity { get; set; }
 
     public bool? CustomTriggers { get; set; }
     public TriggerEffect? TriggerL { get; set; }
@@ -39,10 +41,11 @@ sealed record Verdict(ControllerMode Recommended, string Summary, bool FromPcgw)
         if (info.SupportsDualSense)
         {
             string extra = info.WiredOnly ? " PCGamingWiki lists it as wired-only; Zerk Sense 5 presents a wired controller." : "";
+            string gyro = info.Motion == Support.Yes ? " Uses the gyro itself." : "";
             return new Verdict(ControllerMode.DualSense,
                 info.Haptics == Support.Yes || info.AdaptiveTriggers == Support.Yes
-                    ? "Native DualSense support with haptics and adaptive triggers." + extra
-                    : "Native DualSense support." + extra, true);
+                    ? "Native DualSense support with haptics and adaptive triggers." + gyro + extra
+                    : "Native DualSense support." + gyro + extra, true);
         }
 
         if (info.PlayStation == Support.Yes)
@@ -69,6 +72,9 @@ sealed class ActiveSettings(Config cfg)
     public byte[] LightbarColor => Profile?.LightbarColor ?? cfg.LightbarColor;
     public bool TouchpadMouse => Profile?.TouchpadMouse ?? cfg.TouchpadMouse;
     public bool BindingsEnabled => Profile?.Bindings ?? true;
+    public bool NativeGyro { get; set; }
+    public GyroMode GyroMode => Profile?.GyroMode ?? (NativeGyro ? GyroMode.Off : cfg.GyroMode);
+    public int GyroSensitivity => Math.Clamp(Profile?.GyroSensitivity ?? cfg.GyroSensitivity, 1, 50);
 
     public bool GlobalTriggers => Profile?.CustomTriggers == null;
 
