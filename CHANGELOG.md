@@ -2,6 +2,11 @@
 
 All notable changes to this project are documented here. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and versions follow [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+- HidHide showed as "not installed" when it was installed to a folder other than the default one.
+
 ## [0.8.0-alpha.1] - 2026-11-11
 
 ### Added

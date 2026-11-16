@@ -114,9 +114,35 @@ sealed class HidHide(string cli)
     public static HidHide? Locate()
     {
         var pf = Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles);
-        var cli = Proc.FindExe("", "HidHideCLI.exe",
-            Path.Combine(pf, "Nefarius Software Solutions", "HidHide", "x64", "HidHideCLI.exe"));
+        var dirs = new[] { InstallDirFromRegistry(), Path.Combine(pf, "Nefarius Software Solutions", "HidHide") };
+        var candidates = dirs.OfType<string>()
+            .SelectMany(d => new[] { Path.Combine(d, "x64", "HidHideCLI.exe"), Path.Combine(d, "HidHideCLI.exe") })
+            .ToArray();
+        var cli = Proc.FindExe("", "HidHideCLI.exe", candidates);
         return cli == null ? null : new HidHide(cli);
+    }
+
+    static string? InstallDirFromRegistry()
+    {
+        try
+        {
+            if (Microsoft.Win32.Registry.GetValue(@"HKEY_LOCAL_MACHINE\SOFTWARE\Nefarius Software Solutions e.U.\HidHide", "Path", null)
+                is string { Length: > 0 } path)
+                return path;
+
+            using var uninstall = Microsoft.Win32.Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall");
+            if (uninstall == null) return null;
+            foreach (var name in uninstall.GetSubKeyNames())
+            {
+                using var key = uninstall.OpenSubKey(name);
+                if (key?.GetValue("DisplayName") is "HidHide" && key.GetValue("InstallLocation") is string { Length: > 0 } loc)
+                    return loc;
+            }
+        }
+        catch (Exception e) when (e is System.Security.SecurityException or IOException or UnauthorizedAccessException)
+        {
+        }
+        return null;
     }
 
     public void AllowSelf() => Proc.Run(cli, $"--app-reg \"{Environment.ProcessPath}\"");
