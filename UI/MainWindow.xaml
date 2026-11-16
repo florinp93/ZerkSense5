@@ -1093,7 +1093,7 @@
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="*" /><ColumnDefinition Width="Auto" /></Grid.ColumnDefinitions>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock Text="Touchpad as mouse" Style="{StaticResource CardTitle}" />
-                                        <TextBlock Text="Slide one finger to move the pointer, two fingers to scroll. Clicking the touchpad clicks the mouse." Style="{StaticResource Hint}" TextWrapping="Wrap" />
+                                        <TextBlock Text="Slide one finger to move the pointer, two fingers to scroll. Clicking the touchpad clicks the mouse. To switch it on and off from the controller, add a button binding below, such as L3 + R3." Style="{StaticResource Hint}" TextWrapping="Wrap" />
                                         <TextBlock Text="{Binding TouchpadMouseState}" Style="{StaticResource Hint}" Foreground="{StaticResource AccentLight}" Margin="0,2,0,0" />
                                     </StackPanel>
                                     <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding TouchpadMouse}" />
@@ -1234,6 +1234,7 @@
                                 <WrapPanel Margin="0,10,0,0">
                                     <TextBlock Text="Quick add:" Style="{StaticResource Hint}" VerticalAlignment="Center" Margin="0,0,10,0" />
                                     <Button Content="PS button → key" Style="{StaticResource LinkButton}" Command="{Binding AddPsToKey}" Margin="0,0,16,0" />
+                                    <Button Content="L3 + R3 → touchpad mouse on/off" Style="{StaticResource LinkButton}" Command="{Binding AddTouchpadToggle}" Margin="0,0,16,0" />
                                     <Button Content="L1 + R1 + L2 + R2 + Create + Options → turn off" Style="{StaticResource LinkButton}" Command="{Binding AddTurnOff}" />
                                 </WrapPanel>
 

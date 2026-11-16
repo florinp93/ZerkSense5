@@ -182,6 +182,10 @@ partial class MainViewModel
     });
     ICommand? _addPsToKey;
 
+    public ICommand AddTouchpadToggle => _addTouchpadToggle ??= new Relay(_ =>
+        BeginEdit(null, new ButtonBinding { Buttons = [PadButton.L3, PadButton.R3], Action = BindingAction.ToggleTouchpadMouse }));
+    ICommand? _addTouchpadToggle;
+
     public ICommand AddTurnOff => _addTurnOff ??= new Relay(_ =>
         BeginEdit(null, new ButtonBinding { Buttons = [.. TurnOffChord], Action = BindingAction.TurnOffController, PassThrough = true }));
     ICommand? _addTurnOff;

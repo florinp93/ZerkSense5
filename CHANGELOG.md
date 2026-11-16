@@ -9,6 +9,7 @@ All notable changes to this project are documented here. The format follows [Kee
 
 ### Changed
 - The game page and overlay show gyro support as "Native gyro", or "Gyro aiming" when Zerk Sense 5 adds it.
+- Button bindings have a quick add for L3 + R3 to switch the touchpad mouse on and off.
 
 ### Fixed
 - HidHide showed as "not installed" when it was installed to a folder other than the default one.
